@@ -89,8 +89,12 @@ STORAGES = {
     'default': {
         'BACKEND': 'core.storage.LuluFilesStorage',
     },
+    # Non-manifest: django-jazzmin's theme switcher calls {% static %} on a
+    # bare "vendor/bootswatch" base path (for its client-side theme picker),
+    # which has no matching file and crashes the strict Manifest storage's
+    # hash lookup. The plain compressed storage skips that lookup entirely.
     'staticfiles': {
-        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        'BACKEND': 'whitenoise.storage.CompressedStaticFilesStorage',
     },
 }
 
@@ -201,7 +205,7 @@ JAZZMIN_UI_TWEAKS = {
     'sidebar_nav_legacy_style': False,
     'sidebar_nav_flat_style': True,
     'theme': 'darkly',
-    'dark_mode_theme': 'darkly',
+    'default_theme_mode': 'dark',
     'button_classes': {
         'primary': 'btn-outline-info',
         'secondary': 'btn-outline-secondary',
