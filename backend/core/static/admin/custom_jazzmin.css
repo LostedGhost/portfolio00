@@ -1,0 +1,66 @@
+/* AdminLTE 4 / Bootstrap 5.3 theme colors are driven by CSS custom
+   properties (--bs-body-bg, --bs-tertiary-bg, ...), not fixed classes.
+   The "darkly" Bootswatch swap only affects [data-bs-theme="dark"] scopes,
+   which Jazzmin doesn't set by default, so most of the content area falls
+   back to Bootstrap's light variables. Overriding the variables directly
+   (instead of patching every element with !important) makes every
+   bg-body, text and border utility inherit the brand palette consistently. */
+
+:root {
+  --bs-body-bg: #05050f;
+  --bs-body-bg-rgb: 5, 5, 15;
+  --bs-body-color: #e8e8f0;
+  --bs-body-color-rgb: 232, 232, 240;
+  --bs-tertiary-bg: #0d0d22;
+  --bs-tertiary-bg-rgb: 13, 13, 34;
+  --bs-tertiary-color: #9a9ab0;
+  --bs-secondary-bg: #0a0a18;
+  --bs-secondary-bg-rgb: 10, 10, 24;
+  --bs-secondary-color: #9a9ab0;
+  --bs-emphasis-color: #ffffff;
+  --bs-border-color: rgba(232, 232, 240, 0.12);
+  --bs-border-color-translucent: rgba(232, 232, 240, 0.12);
+  --bs-link-color: #00aaff;
+  --bs-link-color-rgb: 0, 170, 255;
+  --bs-link-hover-color: #33bbff;
+  --bs-card-bg: #0d0d22;
+  --bs-card-border-color: rgba(232, 232, 240, 0.12);
+  --bs-table-bg: transparent;
+  --bs-table-color: #e8e8f0;
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+  --bs-table-hover-bg: rgba(0, 170, 255, 0.08);
+}
+
+body,
+.app-content-header,
+.app-content {
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
+
+.form-control,
+.form-select,
+.select2-selection,
+textarea {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--bs-border-color) !important;
+  color: var(--bs-body-color) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #00aaff !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 170, 255, 0.2) !important;
+}
+
+.btn-primary,
+.btn-info {
+  background-color: #00aaff !important;
+  border-color: #00aaff !important;
+  color: #05050f !important;
+}
+
+::selection {
+  background: #00aaff;
+  color: #05050f;
+}

@@ -1,0 +1,24 @@
+# Legacy project (kept locally for reference, not part of this repo)
+/legacy/
+
+# Node / frontend
+node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Python / backend
+__pycache__/
+*.pyc
+backend/venv/
+backend/.venv/
+backend/staticfiles/
+backend/media/
+backend/media_cache/
+backend/db.sqlite3
+backend/.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
