@@ -1,0 +1,35 @@
+databases:
+  - name: portfolio-db
+    plan: free
+    databaseName: portfolio
+    user: portfolio
+
+services:
+  - type: web
+    name: portfolio-backend
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi --log-file -"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: portfolio-db
+          property: connectionString
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: portfolio-backend.onrender.com
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+      - key: LULUFILES_BASE_URL
+        value: https://lulufiles-api.onrender.com
+      - key: LULUFILES_API_KEY
+        sync: false
+      - key: LULUFILES_APP_ID
+        sync: false
