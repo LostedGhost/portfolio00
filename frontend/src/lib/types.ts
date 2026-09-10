@@ -7,6 +7,8 @@ export interface Profile {
   photo: string | null;
   logo: string | null;
   hero_image: string | null;
+  hero_background_image: string | null;
+  hero_background_opacity: number;
   cv: string | null;
   description: string;
   available: boolean;

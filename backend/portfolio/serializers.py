@@ -20,7 +20,8 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = [
             'full_name', 'site_name', 'title', 'email', 'phone', 'photo', 'logo',
-            'hero_image', 'cv', 'description', 'available',
+            'hero_image', 'hero_background_image', 'hero_background_opacity',
+            'cv', 'description', 'available',
         ]
 
 

@@ -38,6 +38,14 @@ class Profile(SingletonModel):
         'image de la scene 3D', upload_to='profile/', blank=True,
         help_text="Utilisee comme texture sur l'objet 3D de l'accueil (distincte de la photo de profil).",
     )
+    hero_background_image = models.ImageField(
+        'image de fond de la scene 3D', upload_to='profile/', blank=True,
+        help_text="Affichee derriere les etoiles, en fond de l'accueil.",
+    )
+    hero_background_opacity = models.PositiveSmallIntegerField(
+        "opacite de l'image de fond (%)", default=30,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+    )
     cv = models.FileField('CV', upload_to='profile/', blank=True)
     description = models.TextField('description', blank=True)
     available = models.BooleanField('disponible', default=True)
@@ -51,6 +59,7 @@ class Profile(SingletonModel):
         resize_uncommitted_field(self.photo, (800, 800))
         resize_uncommitted_field(self.logo, (400, 400))
         resize_uncommitted_field(self.hero_image, (1024, 1024))
+        resize_uncommitted_field(self.hero_background_image, (1920, 1080))
         super().save(*args, **kwargs)
 
     def __str__(self):

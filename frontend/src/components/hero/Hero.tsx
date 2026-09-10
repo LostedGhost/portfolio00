@@ -12,7 +12,21 @@ export function Hero() {
 
   return (
     <section id="hero" ref={ref} className="relative min-h-screen flex items-end overflow-hidden pb-24 pt-32">
-      {tier === 'full' ? <HeroScene active={inView} textureUrl={profile?.hero_image} /> : <HeroFallback2D />}
+      {profile?.hero_background_image && (
+        <div
+          className="absolute inset-0 z-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(${profile.hero_background_image})`,
+            opacity: (profile.hero_background_opacity ?? 30) / 100,
+          }}
+        />
+      )}
+
+      {tier === 'full' ? (
+        <HeroScene active={inView} textureUrl={profile?.hero_image} className="!absolute inset-0 z-[1]" />
+      ) : (
+        <HeroFallback2D />
+      )}
 
       <div
         className="absolute inset-0 z-[5] pointer-events-none"

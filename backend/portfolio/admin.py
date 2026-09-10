@@ -46,14 +46,19 @@ class SingletonAdmin(admin.ModelAdmin):
 
 @admin.register(Profile)
 class ProfileAdmin(SingletonAdmin):
-    readonly_fields = ('photo_preview', 'logo_preview', 'hero_image_preview', 'updated_at')
+    readonly_fields = (
+        'photo_preview', 'logo_preview', 'hero_image_preview', 'hero_background_image_preview', 'updated_at',
+    )
     fields = (
         'full_name', 'site_name', 'title', 'email', 'phone', 'available', 'description',
         'photo', 'photo_preview', 'logo', 'logo_preview',
-        'hero_image', 'hero_image_preview', 'cv', 'updated_at',
+        'hero_image', 'hero_image_preview',
+        'hero_background_image', 'hero_background_image_preview', 'hero_background_opacity',
+        'cv', 'updated_at',
     )
     photo_preview = image_preview('photo', 'Apercu photo')
     logo_preview = image_preview('logo', 'Apercu logo')
+    hero_background_image_preview = image_preview('hero_background_image', 'Apercu image de fond')
     hero_image_preview = image_preview('hero_image', 'Apercu image 3D')
 
 

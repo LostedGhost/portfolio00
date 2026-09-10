@@ -45,11 +45,12 @@ function Core({ textureUrl }: CoreProps) {
 interface HeroSceneProps {
   active: boolean;
   textureUrl?: string | null;
+  className?: string;
 }
 
-export function HeroScene({ active, textureUrl }: HeroSceneProps) {
+export function HeroScene({ active, textureUrl, className = '!absolute inset-0' }: HeroSceneProps) {
   return (
-    <Scene active={active} cameraPosition={[0, 0, 9]} className="!absolute inset-0">
+    <Scene active={active} cameraPosition={[0, 0, 9]} className={className}>
       <Particles count={1400} />
       <Core textureUrl={textureUrl} />
     </Scene>
