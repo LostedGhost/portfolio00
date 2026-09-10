@@ -1,4 +1,5 @@
 import { useContactInfo } from '../../api/hooks';
+import { SocialLinks } from '../shared/SocialLinks';
 
 export function ContactInfo() {
   const { data: info } = useContactInfo();
@@ -21,6 +22,7 @@ export function ContactInfo() {
           {info.email}
         </a>
       </div>
+      <SocialLinks className="pt-2" />
     </div>
   );
 }

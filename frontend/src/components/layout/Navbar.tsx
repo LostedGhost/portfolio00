@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useCertifications, useEducation, useProfile } from '../../api/hooks';
-import { SocialLinks } from '../shared/SocialLinks';
 
 const BASE_LINKS = [
   { href: '#about', label: 'A propos' },
@@ -39,18 +38,15 @@ export function Navbar() {
           <span className="font-display font-semibold text-lg">{profile?.full_name?.split(' ')[0] ?? 'Portfolio'}</span>
         </a>
 
-        <div className="hidden md:flex items-center gap-8">
-          <ul className="flex items-center gap-8 text-sm text-(--color-text-dim)">
-            {LINKS.map((l) => (
-              <li key={l.href}>
-                <a href={l.href} className="hover:text-white transition-colors">
-                  {l.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <SocialLinks />
-        </div>
+        <ul className="hidden md:flex items-center gap-8 text-sm text-(--color-text-dim)">
+          {LINKS.map((l) => (
+            <li key={l.href}>
+              <a href={l.href} className="hover:text-white transition-colors">
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
 
         <button
           onClick={() => setOpen((v) => !v)}

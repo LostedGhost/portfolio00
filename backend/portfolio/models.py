@@ -1,6 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+from core.images import resize_uncommitted_field
+
 
 class SingletonModel(models.Model):
     """Base for models that must have exactly one row (pk always 1)."""
@@ -37,6 +39,11 @@ class Profile(SingletonModel):
         verbose_name = 'Profil'
         verbose_name_plural = 'Profil'
 
+    def save(self, *args, **kwargs):
+        resize_uncommitted_field(self.photo, (800, 800))
+        resize_uncommitted_field(self.logo, (400, 400))
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.full_name or 'Profil'
 
@@ -68,6 +75,10 @@ class Technology(OrderedModel):
     class Meta(OrderedModel.Meta):
         verbose_name = 'Technologie'
         verbose_name_plural = 'Technologies'
+
+    def save(self, *args, **kwargs):
+        resize_uncommitted_field(self.logo, (512, 512), background=(255, 255, 255))
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -115,6 +126,10 @@ class Project(OrderedModel):
     class Meta(OrderedModel.Meta):
         verbose_name = 'Projet'
         verbose_name_plural = 'Projets'
+
+    def save(self, *args, **kwargs):
+        resize_uncommitted_field(self.image, (1600, 1000))
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title
@@ -184,6 +199,10 @@ class Testimonial(OrderedModel):
     class Meta(OrderedModel.Meta):
         verbose_name = 'Temoignage'
         verbose_name_plural = 'Temoignages'
+
+    def save(self, *args, **kwargs):
+        resize_uncommitted_field(self.photo, (400, 400))
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.author_name

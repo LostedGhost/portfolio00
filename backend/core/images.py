@@ -29,3 +29,20 @@ def resize_image(file_path, max_size, output_name, background=None):
         buffer = BytesIO()
         img.save(buffer, format='PNG', optimize=True)
         return ContentFile(buffer.getvalue(), name=output_name)
+
+
+def resize_uncommitted_field(field, max_size, background=None):
+    """Downscale a Django FieldFile in place, but only if it holds a file that
+    hasn't been uploaded to storage yet (a fresh admin upload). Already-stored
+    fields are left untouched — re-processing them would mean re-downloading
+    from LuluFiles just to re-upload, for no benefit.
+
+    Without this, an image dropped straight into the admin (as opposed to the
+    one-off import_legacy_data command, which already resizes) bypasses the
+    size cap entirely — for a Technology.logo that's the same oversized-WebGL-
+    texture crash the import resizing was added to fix, just re-opened by the
+    next edit made through the admin instead of the initial import.
+    """
+    if not field or field._committed:
+        return
+    field.file = resize_image(field.file, max_size, field.name, background=background)
