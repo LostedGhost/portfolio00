@@ -1,5 +1,6 @@
 export interface Profile {
   full_name: string;
+  site_name: string;
   title: string;
   email: string;
   phone: string;

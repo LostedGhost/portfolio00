@@ -35,7 +35,9 @@ export function Navbar() {
       <nav className="max-w-6xl mx-auto flex items-center justify-between px-5 py-3">
         <a href="#hero" className="flex items-center gap-2">
           {profile?.logo && <img src={profile.logo} alt="Logo" className="h-9 w-9 rounded-full object-cover" />}
-          <span className="font-display font-semibold text-lg">{profile?.full_name?.split(' ')[0] ?? 'Portfolio'}</span>
+          <span className="font-display font-semibold text-lg">
+            {profile?.site_name || profile?.full_name?.split(' ')[0] || 'Portfolio'}
+          </span>
         </a>
 
         <ul className="hidden md:flex items-center gap-8 text-sm text-(--color-text-dim)">

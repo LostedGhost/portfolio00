@@ -48,7 +48,7 @@ class SingletonAdmin(admin.ModelAdmin):
 class ProfileAdmin(SingletonAdmin):
     readonly_fields = ('photo_preview', 'logo_preview', 'updated_at')
     fields = (
-        'full_name', 'title', 'email', 'phone', 'available', 'description',
+        'full_name', 'site_name', 'title', 'email', 'phone', 'available', 'description',
         'photo', 'photo_preview', 'logo', 'logo_preview', 'cv', 'updated_at',
     )
     photo_preview = image_preview('photo', 'Apercu photo')

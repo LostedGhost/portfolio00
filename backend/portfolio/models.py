@@ -25,6 +25,10 @@ class SingletonModel(models.Model):
 
 class Profile(SingletonModel):
     full_name = models.CharField('nom complet', max_length=200)
+    site_name = models.CharField(
+        'nom du site / marque', max_length=100, blank=True,
+        help_text="Affiche dans la barre de navigation et le pied de page. Laisser vide pour utiliser le nom complet.",
+    )
     title = models.CharField('poste', max_length=200)
     email = models.EmailField('email')
     phone = models.CharField('telephone', max_length=50, blank=True)
