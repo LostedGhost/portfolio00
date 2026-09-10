@@ -12,7 +12,7 @@ export function Hero() {
 
   return (
     <section id="hero" ref={ref} className="relative min-h-screen flex items-end overflow-hidden pb-24 pt-32">
-      {tier === 'full' ? <HeroScene active={inView} /> : <HeroFallback2D />}
+      {tier === 'full' ? <HeroScene active={inView} photoUrl={profile?.photo} /> : <HeroFallback2D />}
 
       <div
         className="absolute inset-0 z-[5] pointer-events-none"

@@ -1,12 +1,19 @@
-import { Float, MeshDistortMaterial } from '@react-three/drei';
+import { Float, MeshDistortMaterial, useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import type { Mesh } from 'three';
+import { SRGBColorSpace } from 'three';
 import { Particles } from '../three/Particles';
 import { Scene } from '../three/Scene';
 
-function Core() {
+interface CoreProps {
+  photoUrl?: string | null;
+}
+
+function Core({ photoUrl }: CoreProps) {
   const mesh = useRef<Mesh>(null);
+  const texture = useTexture(photoUrl || '/icon-192.png');
+  texture.colorSpace = SRGBColorSpace;
 
   useFrame((state) => {
     if (!mesh.current) return;
@@ -19,17 +26,16 @@ function Core() {
   return (
     <Float speed={1.5} rotationIntensity={0.4} floatIntensity={1.2}>
       <mesh ref={mesh} position={[2.6, 0.6, -1.5]}>
-        <icosahedronGeometry args={[1.6, 6]} />
+        <icosahedronGeometry args={[1.7, 6]} />
         <MeshDistortMaterial
-          color="#0a1030"
+          map={photoUrl ? texture : undefined}
+          color={photoUrl ? '#ffffff' : '#0a1030'}
           emissive="#00aaff"
-          emissiveIntensity={0.18}
-          distort={0.3}
+          emissiveIntensity={photoUrl ? 0.06 : 0.18}
+          distort={0.22}
           speed={1.8}
-          roughness={0.25}
-          metalness={0.75}
-          transparent
-          opacity={0.85}
+          roughness={0.4}
+          metalness={0.1}
         />
       </mesh>
     </Float>
@@ -38,13 +44,14 @@ function Core() {
 
 interface HeroSceneProps {
   active: boolean;
+  photoUrl?: string | null;
 }
 
-export function HeroScene({ active }: HeroSceneProps) {
+export function HeroScene({ active, photoUrl }: HeroSceneProps) {
   return (
     <Scene active={active} cameraPosition={[0, 0, 9]} className="!absolute inset-0">
       <Particles count={1400} />
-      <Core />
+      <Core photoUrl={photoUrl} />
     </Scene>
   );
 }
