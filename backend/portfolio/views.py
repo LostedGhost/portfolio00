@@ -50,7 +50,10 @@ class StatisticViewSet(ReadOnlyModelViewSet):
 
 
 class ProjectViewSet(ReadOnlyModelViewSet):
-    queryset = Project.objects.prefetch_related('technologies')
+    # Chronological, most recent first — independent of the admin's
+    # drag-and-drop `order` field, which manages other ordered lists but
+    # isn't what should decide the public display order for projects.
+    queryset = Project.objects.prefetch_related('technologies').order_by('-date')
     serializer_class = ProjectSerializer
 
 

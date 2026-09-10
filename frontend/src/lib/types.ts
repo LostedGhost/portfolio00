@@ -6,6 +6,7 @@ export interface Profile {
   phone: string;
   photo: string | null;
   logo: string | null;
+  hero_image: string | null;
   cv: string | null;
   description: string;
   available: boolean;

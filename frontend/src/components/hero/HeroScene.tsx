@@ -7,12 +7,12 @@ import { Particles } from '../three/Particles';
 import { Scene } from '../three/Scene';
 
 interface CoreProps {
-  photoUrl?: string | null;
+  textureUrl?: string | null;
 }
 
-function Core({ photoUrl }: CoreProps) {
+function Core({ textureUrl }: CoreProps) {
   const mesh = useRef<Mesh>(null);
-  const texture = useTexture(photoUrl || '/icon-192.png');
+  const texture = useTexture(textureUrl || '/icon-192.png');
   texture.colorSpace = SRGBColorSpace;
 
   useFrame((state) => {
@@ -28,10 +28,10 @@ function Core({ photoUrl }: CoreProps) {
       <mesh ref={mesh} position={[2.6, 0.6, -1.5]}>
         <icosahedronGeometry args={[1.7, 6]} />
         <MeshDistortMaterial
-          map={photoUrl ? texture : undefined}
-          color={photoUrl ? '#ffffff' : '#0a1030'}
+          map={textureUrl ? texture : undefined}
+          color={textureUrl ? '#ffffff' : '#0a1030'}
           emissive="#00aaff"
-          emissiveIntensity={photoUrl ? 0.06 : 0.18}
+          emissiveIntensity={textureUrl ? 0.06 : 0.18}
           distort={0.22}
           speed={1.8}
           roughness={0.4}
@@ -44,14 +44,14 @@ function Core({ photoUrl }: CoreProps) {
 
 interface HeroSceneProps {
   active: boolean;
-  photoUrl?: string | null;
+  textureUrl?: string | null;
 }
 
-export function HeroScene({ active, photoUrl }: HeroSceneProps) {
+export function HeroScene({ active, textureUrl }: HeroSceneProps) {
   return (
     <Scene active={active} cameraPosition={[0, 0, 9]} className="!absolute inset-0">
       <Particles count={1400} />
-      <Core photoUrl={photoUrl} />
+      <Core textureUrl={textureUrl} />
     </Scene>
   );
 }

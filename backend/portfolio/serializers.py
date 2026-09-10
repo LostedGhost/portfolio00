@@ -18,7 +18,10 @@ from .models import (
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ['full_name', 'site_name', 'title', 'email', 'phone', 'photo', 'logo', 'cv', 'description', 'available']
+        fields = [
+            'full_name', 'site_name', 'title', 'email', 'phone', 'photo', 'logo',
+            'hero_image', 'cv', 'description', 'available',
+        ]
 
 
 class SkillSerializer(serializers.ModelSerializer):
