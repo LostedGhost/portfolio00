@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useProfile } from '../../api/hooks';
 import { useDeviceTier } from '../../hooks/useDeviceTier';
 import { useInView } from '../../hooks/useInView';
+import { ErrorBoundary } from '../shared/ErrorBoundary';
 import { HeroFallback2D } from './HeroFallback2D';
 import { HeroScene } from './HeroScene';
 
@@ -23,7 +24,9 @@ export function Hero() {
       )}
 
       {tier === 'full' ? (
-        <HeroScene active={inView} textureUrl={profile?.hero_image} className="!absolute inset-0 z-[1]" />
+        <ErrorBoundary fallback={<HeroFallback2D />}>
+          <HeroScene active={inView} textureUrl={profile?.hero_image} className="!absolute inset-0 z-[1]" />
+        </ErrorBoundary>
       ) : (
         <HeroFallback2D />
       )}

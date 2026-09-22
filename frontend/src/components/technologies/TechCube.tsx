@@ -1,4 +1,5 @@
 import { Scene } from '../three/Scene';
+import { ErrorBoundary } from '../shared/ErrorBoundary';
 import { TechDie } from './TechDie';
 import type { Technology } from '../../lib/types';
 
@@ -22,11 +23,9 @@ export function TechCube({ technologies, active }: TechCubeProps) {
           const col = i % COLUMNS;
           const row = Math.floor(i / COLUMNS);
           return (
-            <TechDie
-              key={tech.id}
-              technology={tech}
-              position={[col * SPACING - offsetX, offsetY - row * SPACING, 0]}
-            />
+            <ErrorBoundary key={tech.id}>
+              <TechDie technology={tech} position={[col * SPACING - offsetX, offsetY - row * SPACING, 0]} />
+            </ErrorBoundary>
           );
         })}
       </Scene>
