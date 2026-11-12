@@ -19,6 +19,7 @@ import { Manifest } from './story/Manifest';
 import { CustomCursor } from './story/overlay/Cursor';
 import { ChapterBorders } from './story/overlay/ChapterBorders';
 import { TechMarquee } from './story/overlay/Atoms';
+import { PreloaderOverlay, usePreloader } from './story/overlay/Preloader';
 import { Footer } from './components/layout/Footer';
 import { useDynamicFavicon } from './hooks/useDynamicFavicon';
 import { useStructuredData } from './hooks/useStructuredData';
@@ -30,7 +31,7 @@ const StoryScene = lazy(() =>
 );
 
 /** Le récit complet, habillé des liants globaux. */
-function Récit({ sceneOn }: { sceneOn: boolean }) {
+function Récit({ sceneOn, opened }: { sceneOn: boolean; opened: boolean }) {
   useChapterTriggers();
   return (
     <>
@@ -38,7 +39,7 @@ function Récit({ sceneOn }: { sceneOn: boolean }) {
         <div className="fixed inset-0 -z-10 pointer-events-none">
           <ErrorBoundary fallback={<HeroFallback2D />}>
             <Suspense fallback={<HeroFallback2D />}>
-              <StoryScene active className="h-full w-full" />
+              <StoryScene active opened={opened} className="h-full w-full" />
             </Suspense>
           </ErrorBoundary>
         </div>
@@ -81,11 +82,15 @@ function App() {
   const tier = useDeviceTier();
   const reduced = useReducedMotion();
   const sceneOn = tier === 'full' && !reduced;
+  const { ready, pct } = usePreloader();
 
   return (
     <ScrollSocle>
       <div className={sceneOn ? 'grain' : undefined}>
-        <Récit sceneOn={sceneOn} />
+        {/* Blocage du scroll pendant le preloader */}
+        <style>{ready ? '' : 'body { overflow: hidden; }'}</style>
+        <PreloaderOverlay ready={ready} pct={pct} />
+        <Récit sceneOn={sceneOn} opened={ready} />
       </div>
     </ScrollSocle>
   );

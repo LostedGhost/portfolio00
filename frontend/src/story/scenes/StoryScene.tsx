@@ -5,6 +5,14 @@ import { DoubleSide, MathUtils, type Group, type Mesh } from 'three';
 import { scrollState } from '../scroll/System';
 import { CeramicOrb } from './parts/CeramicOrb';
 import { ToolCubes } from './parts/ToolCubes';
+import { DieOpening } from './parts/DieOpening';
+
+interface StorySceneProps {
+  active: boolean;
+  className?: string;
+  /** ouvert = preloader terminé, le dé plein prend le relais. */
+  opened?: boolean;
+}
 
 /**
  * SCÈNE CONTINUE (socle GSAP + ScrollTrigger) :
@@ -19,6 +27,8 @@ import { ToolCubes } from './parts/ToolCubes';
 interface StorySceneProps {
   active: boolean;
   className?: string;
+  /** ouvert = preloader terminé : le dé plein prend le relais de DieOpening. */
+  opened?: boolean;
 }
 
 const MINT = '#57ff9a';
@@ -160,7 +170,7 @@ function deriveWindows(): Array<{ id: string; from: number; to: number }> {
   return ids.map((id, i) => ({ id, from: i / ids.length, to: (i + 1) / ids.length }));
 }
 
-function Stage({ quality }: { quality: 'high' | 'low' }) {
+function Stage({ quality, opened }: { quality: 'high' | 'low'; opened: boolean }) {
   const group = useRef<Group>(null);
   const smooth = useRef(0);
 
@@ -173,21 +183,25 @@ function Stage({ quality }: { quality: 'high' | 'low' }) {
   return (
     <group ref={group}>
       <group position={[2.4, 0.3, 0]}>
-        <Float speed={1.4} rotationIntensity={0.2} floatIntensity={0.9}>
-          <Die />
-        </Float>
+        {!opened ? (
+          <DieOpening opened={opened} />
+        ) : (
+          <Float speed={1.4} rotationIntensity={0.2} floatIntensity={0.9}>
+            <Die />
+          </Float>
+        )}
       </group>
       <StorySatellites quality={quality} />
       {/* Sphère céramique ch.02 (facettes révélées séquentiellement) —
           remplace l'orb de la recette satellites si quality high. */}
-      {quality === 'high' && <CeramicOrb position={[-3.8, 0, -2.5]} />}
+      {quality === 'high' && opened && <CeramicOrb position={[-3.8, 0, -2.5]} />}
       {/* Migration cubique ch.03 → ch.04 */}
-      <ToolCubes position={[0, 0, -1.2]} />
+      {opened && <ToolCubes position={[0, 0, -1.2]} />}
     </group>
   );
 }
 
-export function StoryScene({ active, className }: StorySceneProps) {
+export function StoryScene({ active, className, opened = true }: StorySceneProps) {
   const [quality, setQuality] = useState<'high' | 'low'>('high');
 
   return (
@@ -202,7 +216,7 @@ export function StoryScene({ active, className }: StorySceneProps) {
         <ambientLight intensity={0.8} />
         <directionalLight position={[4, 6, 6]} intensity={1.15} />
         <pointLight position={[-6, -4, 2]} intensity={0.7} color={MINT} />
-        <Stage quality={quality} />
+        <Stage quality={quality} opened={opened} />
       </Canvas>
     </div>
   );
