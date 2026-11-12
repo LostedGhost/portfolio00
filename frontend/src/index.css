@@ -90,6 +90,22 @@ h1, h2, h3, h4 {
   100% { transform: translateY(90%); opacity: 0; }
 }
 
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Grain très léger (overlay screenshot-proof, base64 1px fractal-like) */
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+
 /* ---- Glisse (verre liquide) : thème sombre du portfolio ----
    glisse pose data-theme="dark" sur <body> via index.html ; on aligne le
    verre sur la palette du site (bleu nuit, bord discret) au lieu du gris
