@@ -3,6 +3,8 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { useRef, useState } from 'react';
 import { DoubleSide, MathUtils, type Group, type Mesh } from 'three';
 import { scrollState } from '../scroll/System';
+import { CeramicOrb } from './parts/CeramicOrb';
+import { ToolCubes } from './parts/ToolCubes';
 
 /**
  * SCÈNE CONTINUE (socle GSAP + ScrollTrigger) :
@@ -176,6 +178,11 @@ function Stage({ quality }: { quality: 'high' | 'low' }) {
         </Float>
       </group>
       <StorySatellites quality={quality} />
+      {/* Sphère céramique ch.02 (facettes révélées séquentiellement) —
+          remplace l'orb de la recette satellites si quality high. */}
+      {quality === 'high' && <CeramicOrb position={[-3.8, 0, -2.5]} />}
+      {/* Migration cubique ch.03 → ch.04 */}
+      <ToolCubes position={[0, 0, -1.2]} />
     </group>
   );
 }
