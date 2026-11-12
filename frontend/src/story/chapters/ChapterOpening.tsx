@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useProfile } from '../../api/hooks';
 import { hero } from '../../mock/data';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
-import { dieFacesState } from '../scenes/parts/DieOpening';
+import { dieFacesState } from '../faceState';
 
 /**
  * Chapitre 01 — Le dé. La scène 3D est CONTINUE (montée fixe dans App) ;

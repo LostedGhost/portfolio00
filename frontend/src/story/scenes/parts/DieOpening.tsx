@@ -2,6 +2,7 @@ import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { MathUtils, type Group, type Mesh } from 'three';
+import { dieFacesState } from '../../faceState';
 
 /**
  * Ouverture du dé (ch.01) : les 6 faces se matérialisent une à une
@@ -15,12 +16,8 @@ import { MathUtils, type Group, type Mesh } from 'three';
  */
 const DURATION = 0.15;
 const STAGGER = 0.15;
-const TOTAL = 6 * STAGGER; // 0.9s
 const MINT = new THREE.Color('#57ff9a');
 const CLAY = new THREE.Color('#c8ded0');
-
-/** Compteur partagé : faces posées 0..6 (l'introduction du nom s'y calque). */
-export const dieFacesState = { placed: 0 };
 
 const FACES: Array<{ pos: [number, number, number]; rot: [number, number, number] }> = [
   { pos: [0.5, 0, 0], rot: [0, Math.PI / 2, 0] },
@@ -94,20 +91,15 @@ export function DieOpening({ opened }: { opened: boolean }) {
 }
 
 /**
- * Chute + rebond du dé au PREMIER scroll (ch.01, ~300 premiers px) :
- * bounce physique simple piloté par scrollY ; partagé à la scène.
+ * Chute + rebond du dé au PREMIER scroll (ch.01, ~320 premiers px) :
+ * fonction pure du scrollY, partagée à la scène (chute ease-in + rebond).
  */
-const dropState = { done: false, y: 0 };
 
 export function computeDropOffset(scrollY: number): number {
-  // 0 → 300px de scroll : la chute de 1.2 unité monte (le dé « tombe » visuellement
-  // vers sa position d'attente). Rebond amorti (courbe abs(sin) décroissante).
+  // 0 → 320px de scroll : chute ease-in, puis rebond amorti (sin décroissant).
   if (scrollY >= 320) return 0;
   const t = MathUtils.clamp(scrollY / 320, 0, 1);
-  // chute : y va de 0 à -0.9 en ease-in, puis rebond représenté en inverse du sin dampé
   const fall = -0.9 * t * t;
   const bounce = Math.abs(Math.sin(t * Math.PI * 1.5)) * (1 - t) * 0.35;
   return fall + bounce * 0.35;
 }
-
-export { dropState, TOTAL };

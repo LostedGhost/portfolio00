@@ -115,8 +115,6 @@ function App() {
   return (
     <ScrollSocle>
       <div className={sceneOn ? 'grain' : undefined}>
-        {/* Blocage du scroll pendant le preloader */}
-        <style>{ready ? '' : 'body { overflow: hidden; }'}</style>
         <PreloaderOverlay ready={ready} pct={pct} />
         <Récit sceneOn={sceneOn} opened={ready} />
       </div>

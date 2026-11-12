@@ -45,12 +45,15 @@ export function ScrollSocle({ children }: { children: React.ReactNode }) {
     let lastT = performance.now();
 
     const update = (time: number) => {
-      lenis?.raf(time);
+      // ATTENTION : gsap.ticker fournit `time` en SECONDES, lenis.raf attend
+      // des MILLISECONDES — sans ×1000, le scroll tourne au 1/60 de vitesse
+      // et « résiste » (bug d'intégration classique Lenis+GSAP).
+      lenis?.raf(time * 1000);
       const y = window.scrollY;
-      const dt = Math.max(0.001, (time - lastT) / 1000);
+      const dt = Math.max(0.001, (performance.now() - lastT) / 1000);
       scrollState.velocity = (y - lastY) / dt;
       lastY = y;
-      lastT = time;
+      lastT = performance.now();
       const docH = document.documentElement.scrollHeight - window.innerHeight;
       scrollState.global = docH > 0 ? y / docH : 0;
       ScrollTrigger.update();

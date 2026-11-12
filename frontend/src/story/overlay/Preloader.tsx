@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { dieFacesState } from '../faceState';
 
 /**
- * Preloader (ch.01, < 2,5 s) : compteur 0→100 lié au chargement RÉEL des
- * images critiques [data-critical], plancher 1 s, plafond 2,5 s.
- * Reduced-motion / cache chaud : quasi instantané.
+ * Preloader (ch.01, < 2,5 s) : deux signaux combinés —
+ *  1. le canvas 3D signale que le dé est entièrement construit (faces posées) ;
+ *  2. les images critiques sont chargées (s'il y en a).
+ * Plancher 1 s, plafond 2,5 s. Reduced-motion / cache chaud : quasi instantané.
  */
 export function usePreloader(): { ready: boolean; pct: number } {
   const [ready, setReady] = useState(false);
@@ -11,36 +13,75 @@ export function usePreloader(): { ready: boolean; pct: number } {
 
   useEffect(() => {
     const start = performance.now();
-    const imgs = Array.from(document.querySelectorAll<HTMLImageElement>('img[data-critical]'));
-    const total = Math.max(1, imgs.length);
-    let loaded = 0;
+    let sceneReady = false;
+    let assetsDone = false;
     let done = false;
+    const timers: number[] = [];
+    // Progrès : 60 % pour la scène, 40 % pour les assets.
+    const scenePct = { value: 0 };
+
+    const progress = () => {
+      const base = sceneReady ? 60 : Math.min(55, scenePct.value);
+      const assets = assetsDone ? 40 : 5;
+      setPct(Math.min(100, base + assets));
+    };
 
     const finish = () => {
       if (done) return;
       done = true;
+      timers.forEach((t) => clearTimeout(t));
       setPct(100);
       const elapsed = performance.now() - start;
       const wait = Math.max(0, 1000 - elapsed);
-      setTimeout(() => setReady(true), wait);
+      timers.push(
+        window.setTimeout(() => {
+          setReady(true);
+          document.body.style.overflow = '';
+        }, wait),
+      );
     };
 
-    const tick = () => {
-      loaded++;
-      setPct(Math.round((loaded / total) * 100));
-      if (loaded >= total) finish();
-    };
-
-    imgs.forEach((img) => {
-      if (img.complete) tick();
-      else {
-        img.addEventListener('load', tick, { once: true });
-        img.addEventListener('error', tick, { once: true });
+    // Signal 1 : la scène polle dieFacesState (le dé se construit).
+    const pollScene = () => {
+      scenePct.value = (dieFacesState.placed / 6) * 55;
+      if (dieFacesState.placed >= 6) {
+        sceneReady = true;
+        if (assetsDone) finish();
+        else progress();
+      } else {
+        progress();
+        timers.push(window.setTimeout(pollScene, 120));
       }
-    });
+    };
+    pollScene();
 
-    const bail = setTimeout(finish, 2500);
-    return () => clearTimeout(bail);
+    // Signal 2 : images critiques (peut être vide → immédiat).
+    const imgs = Array.from(document.querySelectorAll<HTMLImageElement>('img[data-critical]'));
+    if (imgs.length === 0) {
+      assetsDone = true;
+    } else {
+      let loaded = 0;
+      const tick = () => {
+        loaded++;
+        if (loaded >= imgs.length) {
+          assetsDone = true;
+          if (sceneReady) finish();
+        }
+      };
+      imgs.forEach((img) => {
+        if (img.complete) tick();
+        else {
+          img.addEventListener('load', tick, { once: true });
+          img.addEventListener('error', tick, { once: true });
+        }
+      });
+    }
+
+    // Garde-fou dur : 2,5 s max.
+    timers.push(window.setTimeout(finish, 2500));
+    progress();
+
+    return () => timers.forEach((t) => clearTimeout(t));
   }, []);
 
   return { ready, pct };

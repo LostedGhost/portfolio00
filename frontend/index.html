@@ -71,23 +71,47 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- Filet hors-React : si le bundle plante avant le premier rendu,
-          affiche l'erreur réelle au lieu d'un écran vide. -->
+    <!-- DIAGNOSTIC COMPLET (à retirer une fois le bug trouvé) : capture
+         TOUTES les erreurs JS + les rejets de promesse, les affiche en
+         overlay fixe, et les envoie au serveur via /__log (optionnel). -->
     <script>
-      window.addEventListener('error', function (e) {
-        var root = document.getElementById('root');
-        if (root && !root.hasChildNodes()) {
-          document.body.insertAdjacentHTML(
-            'beforeend',
-            '<div style="position:fixed;inset:0;z-index:9999;background:#070c09;color:#eaf5ee;font:13px/1.6 monospace;padding:24px;overflow:auto">' +
-              '<p style="color:#57ff9a">Erreur de démarrage :</p><pre style="white-space:pre-wrap">' +
-              String(e.message || e.error || e) +
-              '</pre><pre style="white-space:pre-wrap;color:#93a89b">' +
-              (e.error && e.error.stack ? e.error.stack : '') +
-              '</pre></div>'
-          );
+      (function () {
+        var box = null;
+        function show(title, detail) {
+          if (!box) {
+            box = document.createElement('div');
+            box.style.cssText =
+              'position:fixed;left:0;right:0;bottom:0;z-index:99999;background:rgba(7,12,9,.96);' +
+              'color:#eaf5ee;font:11px/1.5 monospace;padding:10px 14px;max-height:45vh;overflow:auto;' +
+              'border-top:2px solid #57ff9a;white-space:pre-wrap';
+            document.body.appendChild(box);
+          }
+          box.textContent += title + '\n' + (detail || '') + '\n\n';
         }
-      });
+        window.addEventListener('error', function (e) {
+          show('ERREUR JS: ' + (e.message || e), e.error && e.error.stack);
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          var r = e.reason;
+          show('PROMESSE REJETÉE:', r && (r.stack || r.message) ? String(r.stack || r.message) : String(r));
+        });
+        // Outil scroll : mesure la réactivité en direct (coin bas droit).
+        window.addEventListener('load', function () {
+          var m = document.createElement('div');
+          m.style.cssText =
+            'position:fixed;right:8px;bottom:8px;z-index:99999;background:#070c09;border:1px solid #57ff9a;' +
+            'color:#57ff9a;font:10px monospace;padding:4px 8px;pointer-events:none';
+          document.body.appendChild(m);
+          var lastY = window.scrollY, lastT = performance.now();
+          setInterval(function () {
+            var now = performance.now();
+            var v = Math.round(Math.abs(window.scrollY - lastY) / ((now - lastT) / 1000));
+            lastY = window.scrollY; lastT = now;
+            var lenis = document.documentElement.style.cssText;
+            m.textContent = 'scrollY=' + Math.round(window.scrollY) + ' | v=' + v + 'px/s | html.style=' + (lenis ? 'oui' : 'non');
+          }, 500);
+        });
+      })();
     </script>
   </body>
 </html>
