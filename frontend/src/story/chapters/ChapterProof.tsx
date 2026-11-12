@@ -24,7 +24,7 @@ export function ChapterProof() {
   useGSAP(
     () => {
       if (reduced) return;
-      root.current!.querySelectorAll<HTMLElement>('[data-card]').forEach((card, i) => {
+      root.current?.querySelectorAll<HTMLElement>('[data-card]').forEach((card, i) => {
         gsap.fromTo(
           card,
           { opacity: 0, z: -60, filter: 'blur(8px)', y: 24 },

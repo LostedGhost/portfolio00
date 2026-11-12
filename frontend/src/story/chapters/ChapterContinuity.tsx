@@ -32,7 +32,7 @@ export function ChapterContinuity() {
   // Liseré menthe : suit le focus de champ en champ (FLIP manuel du cadre).
   useGSAP(
     () => {
-      const form = root.current!.querySelector('form');
+      const form = root.current?.querySelector('form');
       if (!form) return;
       const fields = form.querySelectorAll<HTMLElement>('input:not([tabindex="-1"]), textarea');
       const ring = document.createElement('span');

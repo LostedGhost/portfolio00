@@ -8,16 +8,22 @@ import { Chapter } from '../Chapter';
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** Interlude — Les échos : cartes-volets qui se déplient depuis la droite. */
+/**
+ * Interlude — Les échos : cartes-volets qui se déplient depuis la droite.
+ * NOTE ROBUSTESSE : l'early-return (aucun témoignage) se fait AVANT le
+ * hook useGSAP — sinon le composant rend null et useGSAP tourne sur un
+ * scope null (crash 'n.current is null').
+ */
 export function ChapterEchoes() {
   const { data: testimonials = [] } = useTestimonials();
   const reduced = useReducedMotion();
   const root = useRef<HTMLElement>(null);
+  const hasContent = testimonials.length > 0;
 
   useGSAP(
     () => {
-      if (reduced) return;
-      root.current!.querySelectorAll<HTMLElement>('[data-echo]').forEach((el, i) => {
+      if (reduced || !root.current) return;
+      root.current.querySelectorAll<HTMLElement>('[data-echo]').forEach((el, i) => {
         gsap.fromTo(
           el,
           { rotationY: -15, opacity: 0, transformPerspective: 900, transformOrigin: 'right center' },
@@ -32,10 +38,10 @@ export function ChapterEchoes() {
         );
       });
     },
-    { scope: root, dependencies: [reduced, testimonials.length] },
+    { scope: root, dependencies: [reduced, hasContent] },
   );
 
-  if (testimonials.length === 0) return null;
+  if (!hasContent) return null;
 
   return (
     <Chapter ref={root} index="05+" id="echoes" title="Les échos">
@@ -44,7 +50,7 @@ export function ChapterEchoes() {
           <figure
             key={t.id}
             data-echo
-            className="border border-(--color-border) bg-white/[0.02] p-6 flex flex-col will-change-transform opacity-0"
+            className="border border-(--color-border) bg-white/[0.02] p-6 flex flex-col will-change-transform"
           >
             <blockquote className="text-(--color-text-dim) leading-relaxed flex-1">« {t.content} »</blockquote>
             <figcaption className="flex items-center gap-3 mt-6 pt-4 border-t border-(--color-border)">

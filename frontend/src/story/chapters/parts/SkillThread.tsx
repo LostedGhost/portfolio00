@@ -16,7 +16,8 @@ export function SkillThread({ skills }: { skills: Skill[] }) {
 
   useGSAP(
     () => {
-      const values = root.current!.querySelectorAll<HTMLElement>('[data-value]');
+      if (!root.current) return;
+      const values = root.current.querySelectorAll<HTMLElement>('[data-value]');
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -29,7 +30,7 @@ export function SkillThread({ skills }: { skills: Skill[] }) {
       // Le fil descend en premier.
       tl.fromTo('[data-thread]', { scaleY: 0 }, { scaleY: 1, ease: 'none', duration: 1 });
       // Les barres s'allument en cascade derrière le fil (jusqu'à leur cible).
-      root.current!.querySelectorAll<HTMLElement>('[data-fill]').forEach((f, i) => {
+      root.current?.querySelectorAll<HTMLElement>('[data-fill]').forEach((f, i) => {
         const target = parseFloat(f.dataset.target || '1');
         tl.fromTo(f, { scaleX: 0 }, { scaleX: target, duration: 0.32, ease: 'power2.out' }, 0.12 * i + 0.05);
       });

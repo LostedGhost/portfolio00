@@ -25,9 +25,10 @@ export function ChapterPractice() {
 
   useGSAP(
     () => {
-      if (reduced) return;
-      const line = root.current!.querySelector('[data-line]');
-      const items = root.current!.querySelectorAll<HTMLElement>('[data-item]');
+      if (reduced || !root.current) return;
+      const line = root.current.querySelector('[data-line]');
+      const items = root.current.querySelectorAll<HTMLElement>('[data-item]');
+      if (!line) return;
 
       // Ligne : scaleY scrub 0→1 sur la traversée.
       gsap.fromTo(

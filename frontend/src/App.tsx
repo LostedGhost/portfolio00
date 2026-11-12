@@ -2,6 +2,7 @@ import { lazy, Suspense, Component } from 'react';
 import { useProfile, useSocialLinks } from './api/hooks';
 import { useDeviceTier } from './hooks/useDeviceTier';
 import { useReducedMotion } from './hooks/useReducedMotion';
+import { useWebGLAvailable } from './hooks/useWebGL';
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
 import { HeroFallback2D } from './components/hero/HeroFallback2D';
 import { ChapterRail } from './story/ChapterRail';
@@ -32,7 +33,7 @@ const StoryScene = lazy(() =>
 
 /** Le récit complet, habillé des liants globaux. Chaque bloc critique est
  *  protégé par son propre boundary de diagnostic (message précis). */
-function Récit({ sceneOn, opened }: { sceneOn: boolean; opened: boolean }) {
+function Récit({ sceneOn, opened, webglOk }: { sceneOn: boolean; opened: boolean; webglOk: boolean }) {
   useChapterTriggers();
   const guard = (name: string, node: React.ReactNode) => (
     <ZoneBoundary key={name} name={name}>
@@ -42,15 +43,17 @@ function Récit({ sceneOn, opened }: { sceneOn: boolean; opened: boolean }) {
 
   return (
     <>
-      {sceneOn && (
+      {sceneOn && webglOk && (
         <div className="fixed inset-0 -z-10 pointer-events-none">
-          <ErrorBoundary fallback={<HeroFallback2D />}>
+          <ErrorBoundary fallback={<HeroFallback2D withNotice />}>
             <Suspense fallback={<HeroFallback2D />}>
               <StoryScene active opened={opened} className="h-full w-full" />
             </Suspense>
           </ErrorBoundary>
         </div>
       )}
+      {/* WebGL indisponible : halo de remplacement + bandeau explicite. */}
+      {sceneOn && webglOk === false && <HeroFallback2D withNotice />}
       <CustomCursor />
       <ChapterBorders />
       <ChapterRail />
@@ -110,13 +113,14 @@ function App() {
   const tier = useDeviceTier();
   const reduced = useReducedMotion();
   const sceneOn = tier === 'full' && !reduced;
+  const webglOk = useWebGLAvailable();
   const { ready, pct } = usePreloader();
 
   return (
     <ScrollSocle>
       <div className={sceneOn ? 'grain' : undefined}>
         <PreloaderOverlay ready={ready} pct={pct} />
-        <Récit sceneOn={sceneOn} opened={ready} />
+        <Récit sceneOn={sceneOn} opened={ready} webglOk={webglOk} />
       </div>
     </ScrollSocle>
   );

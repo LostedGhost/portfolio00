@@ -23,7 +23,7 @@ export function ChapterAbout() {
   useGSAP(
     () => {
       if (reduced) return;
-      const photo = root.current!.querySelector<HTMLElement>('[data-photo]');
+      const photo = root.current?.querySelector<HTMLElement>('[data-photo]');
       if (photo) {
         gsap.fromTo(
           photo,
