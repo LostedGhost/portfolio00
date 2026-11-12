@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useReducedMotion } from '../hooks/useReducedMotion';
-import type { ReactNode } from 'react';
+import { forwardRef, type ReactNode } from 'react';
 
 interface ChapterProps {
   /** « 01 »… affiché en mono + ancre. */
@@ -14,15 +14,25 @@ interface ChapterProps {
 }
 
 /**
- * Un chapitre du récit : plein écran quand il le faut, respiration large,
- * numéro MONO comme signature, entrée personnifiée au viewport.
- * Le scroll reste natif — aucune capture.
+ * Un chapitre du récit : plein écran, respiration large, numéro MONO comme
+ * signature, entrée personnifiée au viewport. Le scroll reste natif.
  */
-export function Chapter({ index, id, title, children, artwork }: ChapterProps) {
+export const Chapter = forwardRef<HTMLElement, ChapterProps>(function Chapter(
+  { index, id, title, children, artwork },
+  ref,
+) {
   const reduced = useReducedMotion();
   return (
-    <section id={id} className="relative min-h-screen flex flex-col justify-center px-6 py-24 md:px-16">
-      {artwork && <div className="absolute inset-0 pointer-events-none flex items-center justify-end opacity-70">{artwork}</div>}
+    <section
+      ref={ref}
+      id={id}
+      className="relative min-h-screen flex flex-col justify-center px-6 py-24 md:px-16"
+    >
+      {artwork && (
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-end opacity-70">
+          {artwork}
+        </div>
+      )}
       <motion.div
         initial={reduced ? undefined : { opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -37,4 +47,4 @@ export function Chapter({ index, id, title, children, artwork }: ChapterProps) {
       </motion.div>
     </section>
   );
-}
+});

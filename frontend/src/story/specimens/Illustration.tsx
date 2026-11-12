@@ -63,10 +63,11 @@ export function PathIllustration({ className }: IllustrationProps) {
         strokeWidth="3"
         strokeLinecap="round"
         strokeDasharray="1 8"
+        data-draw
       />
       {/* Jalons */}
-      <circle cx="20" cy="120" r="7" fill="none" stroke={CLAY_DIM} strokeWidth="3" />
-      <circle cx="72" cy="112" r="7" fill="none" stroke={CLAY_DIM} strokeWidth="3" />
+      <circle cx="20" cy="120" r="7" fill="none" stroke={CLAY_DIM} strokeWidth="3" data-draw />
+      <circle cx="72" cy="112" r="7" fill="none" stroke={CLAY_DIM} strokeWidth="3" data-draw />
       <circle cx="105" cy="95" r="7" fill="none" stroke={CLAY_DIM} strokeWidth="3" />
       {/* Sphère maîtresse céramique */}
       <circle cx="152" cy="78" r="34" fill="url(#sph)" />
@@ -133,12 +134,12 @@ export function ProofIllustration({ className }: IllustrationProps) {
       <ellipse cx="105" cy="158" rx="62" ry="8" fill={SHADOW} />
       <rect x="35" y="26" width="140" height="104" rx="14" fill={CLAY} />
       <rect x="44" y="36" width="122" height="84" rx="9" fill="url(#scr)" />
-      {/* interface simple : lignes + KPI + coche */}
+      {/* interface simple : lignes + KPI + coche (les traits se dessinent au scroll) */}
       <rect x="54" y="48" width="44" height="5" rx="2.5" fill={MINT} opacity="0.85" />
-      <rect x="54" y="60" width="70" height="4" rx="2" fill="#eaf5ee" opacity="0.35" />
-      <rect x="54" y="72" width="56" height="4" rx="2" fill="#eaf5ee" opacity="0.25" />
-      <circle cx="134" cy="92" r="16" fill="none" stroke={MINT} strokeWidth="3" opacity="0.9" />
-      <path d="M127 92 l5 5 10 -10" fill="none" stroke={MINT} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="54" y="60" width="70" height="4" rx="2" fill="#eaf5ee" opacity="0.35" data-draw />
+      <rect x="54" y="72" width="56" height="4" rx="2" fill="#eaf5ee" opacity="0.25" data-draw />
+      <circle cx="134" cy="92" r="16" fill="none" stroke={MINT} strokeWidth="3" opacity="0.9" data-draw />
+      <path d="M127 92 l5 5 10 -10" fill="none" stroke={MINT} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" data-draw />
       <rect x="60" y="140" width="90" height="10" rx="5" fill="#b7d2c1" />
     </svg>
   );
