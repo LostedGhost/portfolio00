@@ -70,5 +70,24 @@
   <body data-theme="dark">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Filet hors-React : si le bundle plante avant le premier rendu,
+          affiche l'erreur réelle au lieu d'un écran vide. -->
+    <script>
+      window.addEventListener('error', function (e) {
+        var root = document.getElementById('root');
+        if (root && !root.hasChildNodes()) {
+          document.body.insertAdjacentHTML(
+            'beforeend',
+            '<div style="position:fixed;inset:0;z-index:9999;background:#070c09;color:#eaf5ee;font:13px/1.6 monospace;padding:24px;overflow:auto">' +
+              '<p style="color:#57ff9a">Erreur de démarrage :</p><pre style="white-space:pre-wrap">' +
+              String(e.message || e.error || e) +
+              '</pre><pre style="white-space:pre-wrap;color:#93a89b">' +
+              (e.error && e.error.stack ? e.error.stack : '') +
+              '</pre></div>'
+          );
+        }
+      });
+    </script>
   </body>
 </html>

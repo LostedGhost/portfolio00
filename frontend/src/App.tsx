@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, Component } from 'react';
 import { useProfile, useSocialLinks } from './api/hooks';
 import { useDeviceTier } from './hooks/useDeviceTier';
 import { useReducedMotion } from './hooks/useReducedMotion';
@@ -30,9 +30,16 @@ const StoryScene = lazy(() =>
   import('./story/scenes/StoryScene').then((m) => ({ default: m.StoryScene })),
 );
 
-/** Le récit complet, habillé des liants globaux. */
+/** Le récit complet, habillé des liants globaux. Chaque bloc critique est
+ *  protégé par son propre boundary de diagnostic (message précis). */
 function Récit({ sceneOn, opened }: { sceneOn: boolean; opened: boolean }) {
   useChapterTriggers();
+  const guard = (name: string, node: React.ReactNode) => (
+    <ZoneBoundary key={name} name={name}>
+      {node}
+    </ZoneBoundary>
+  );
+
   return (
     <>
       {sceneOn && (
@@ -50,23 +57,44 @@ function Récit({ sceneOn, opened }: { sceneOn: boolean; opened: boolean }) {
       {/* Ch.01 — Le dé */}
       <ChapterOpening />
       {/* Ch.02 — Le chemin */}
-      <Manifest index="02" text="J'apprends à construire, puis à construire mieux." />
-      <ChapterAbout />
+      {guard('manifest-02', <Manifest index="02" text="J'apprends à construire, puis à construire mieux." />)}
+      {guard('about', <ChapterAbout />)}
       {/* Ch.03 — La pratique */}
-      <Manifest index="03" text="Le code qui compte est celui qu'on livre." />
-      <ChapterPractice />
-      <ChapterFormation />
-      <ChapterToolsLazy />
+      {guard('manifest-03', <Manifest index="03" text="Le code qui compte est celui qu'on livre." />)}
+      {guard('practice', <ChapterPractice />)}
+      {guard('formation', <ChapterFormation />)}
+      {guard('tools', <ChapterToolsLazy />)}
       {/* Respiration : les outils défilent en filigrane */}
       <TechMarquee />
-      <Manifest index="05" text="Des interfaces que des gens réels utilisent chaque jour." />
-      <ChapterProofLazy />
-      <ChapterEchoes />
-      <Manifest index="06" text="La meilleure histoire est celle qu'on écrit ensemble." />
-      <ChapterContinuity />
+      {guard('manifest-05', <Manifest index="05" text="Des interfaces que des gens réels utilisent chaque jour." />)}
+      {guard('proof', <ChapterProofLazy />)}
+      {guard('echoes', <ChapterEchoes />)}
+      {guard('manifest-06', <Manifest index="06" text="La meilleure histoire est celle qu'on écrit ensemble." />)}
+      {guard('contact', <ChapterContinuity />)}
       <Footer />
     </>
   );
+}
+
+/** Boundary de zone : affiche le nom du bloc qui a planté + l'erreur. */
+class ZoneBoundary extends Component<{ name: string; children: React.ReactNode }, { error: string | null }> {
+  state = { error: null as string | null };
+  static getDerivedStateFromError(e: unknown) {
+    return { error: e instanceof Error ? `${e.name}: ${e.message}` : String(e) };
+  }
+  componentDidCatch(e: unknown) {
+    console.error('[ZoneBoundary]', e);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="section font-mono text-xs text-(--color-text-dim) border border-red-500/40 p-4">
+          Zone « {this.props.name} » en erreur : <span className="text-(--color-accent)">{this.state.error}</span> — le reste du récit continue.
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 /**

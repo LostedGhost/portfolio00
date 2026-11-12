@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { useProfile } from '../../api/hooks';
 import { hero } from '../../mock/data';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
+import { dieFacesState } from '../scenes/parts/DieOpening';
 
 /**
  * Chapitre 01 — Le dé. La scène 3D est CONTINUE (montée fixe dans App) ;
  * ce chapitre ne fait que poser le texte par-dessus. Ouverture :
- * HUD tapé au terminal, nom glissé, manifeste révélé mot à mot.
+ * HUD tapé au terminal, NOM réglé sur le rythme des FACES du dé (chaque
+ * face posée libère des lettres du flou vers le net), manifeste révélé.
  */
 export function ChapterOpening() {
   const { data: profile } = useProfile();
@@ -34,9 +36,11 @@ export function ChapterOpening() {
         )}
 
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[0.95]">
-          {profile?.full_name?.split('').map((ch, i) => (
-            <RevealLetter key={i} ch={ch} delay={0.25 + i * 0.045} reduced={reduced} />
-          ))}
+          {!reduced ? (
+            <FaceSyncedName name={profile?.full_name ?? ''} />
+          ) : (
+            profile?.full_name
+          )}
         </h1>
 
         <p className="mt-5 text-base md:text-lg text-(--color-text-dim)">
@@ -75,29 +79,43 @@ function TypedHud({ text }: { text: string }) {
   );
 }
 
-/** Lettre révélée du flou vers le net, en cascade. */
-function RevealLetter({
-  ch,
-  delay,
-  reduced,
-}: {
-  ch: string;
-  delay: number;
-  reduced: boolean;
-}) {
+/**
+ * Nom synchronisé aux FACES du dé : 6 faces = 6 paquets de lettres. Chaque
+ * face posée libère son paquet (flou → net). Sondage rAF léger du compteur
+ * partagé (dieFacesState.placed) — aucun re-render tant que rien bouge.
+ */
+function FaceSyncedName({ name }: { name: string }) {
+  const [visible, setVisible] = useState(0);
+  const total = name.length;
+
+  useEffect(() => {
+    let raf = 0;
+    const tick = () => {
+      const placed = dieFacesState.placed; // 0..6
+      // 6 faces → total lettres : chaque face libère sa tranche.
+      setVisible(Math.round((placed / 6) * total));
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [total]);
+
   return (
-    <span
-      className="inline-block whitespace-pre"
-      style={
-        reduced
-          ? undefined
-          : {
-              animation: `letter-in 0.5s ${delay}s both cubic-bezier(0.22, 1, 0.36, 1)`,
-            }
-      }
-    >
-      {ch}
-    </span>
+    <>
+      {name.split('').map((ch, i) => (
+        <span
+          key={i}
+          className="inline-block whitespace-pre transition-all duration-300"
+          style={
+            i < visible
+              ? undefined
+              : { opacity: 0.08, filter: 'blur(6px)', transform: 'translateY(8px)' }
+          }
+        >
+          {ch}
+        </span>
+      ))}
+    </>
   );
 }
 

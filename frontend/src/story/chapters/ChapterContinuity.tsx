@@ -79,11 +79,16 @@ export function ChapterContinuity() {
       const subject = encodeURIComponent(form.subject ? `[Site] ${form.subject}` : '[Site] Nouveau message');
       const body = encodeURIComponent(`Nom : ${form.name}\nEmail : ${form.email}\n\n${form.message}`);
       window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+      // Le récit boucle : le manifeste 06 « se défait » + le dé fait un tour.
+      window.dispatchEvent(new CustomEvent('story:send'));
       setSent(true);
       return;
     }
     sendMessage.mutate(form, {
-      onSuccess: () => setForm({ name: '', email: '', subject: '', message: '', website: '' }),
+      onSuccess: () => {
+        setForm({ name: '', email: '', subject: '', message: '', website: '' });
+        window.dispatchEvent(new CustomEvent('story:send'));
+      },
     });
   }
 

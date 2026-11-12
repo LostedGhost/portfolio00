@@ -1,11 +1,11 @@
 import { Float, PerformanceMonitor } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { DoubleSide, MathUtils, type Group, type Mesh } from 'three';
 import { scrollState } from '../scroll/System';
 import { CeramicOrb } from './parts/CeramicOrb';
 import { ToolCubes } from './parts/ToolCubes';
-import { DieOpening } from './parts/DieOpening';
+import { DieOpening, computeDropOffset } from './parts/DieOpening';
 
 interface StorySceneProps {
   active: boolean;
@@ -35,6 +35,18 @@ const MINT = '#57ff9a';
 const CLAY = '#c8ded0';
 const CYAN = '#4fc3f7';
 
+/** Logos des technologies (lesd conclus des cubes ch.04) — chemins mock. */
+const techLogos = [
+  '/src/mock/images/tech-react.png',
+  '/src/mock/images/tech-django.png',
+  '/src/mock/images/tech-python.png',
+  '/src/mock/images/tech-postgresql.png',
+  '/src/mock/images/tech-mongodb.png',
+  '/src/mock/images/tech-spring-boot.png',
+  '/src/mock/images/tech-nodejs.png',
+  '/src/mock/images/tech-docker.png',
+];
+
 function clamp01(v: number) {
   return Math.min(1, Math.max(0, v));
 }
@@ -45,25 +57,55 @@ function windowState(from: number, to: number, progress: number) {
   return { y: -6 + local * 12, fade, local };
 }
 
-/** Le dé protagoniste : rotation continue + accélération selon le vent du scroll. */
-function Die() {
+/**
+ * Le dé protagoniste :
+ * - rotation continue, accélérée par le « vent » du scroll ;
+ * - chute+rebond sur les premiers 320 px du premier scroll (caméra suit via Stage) ;
+ * - à partir du ch.06 (progress > 0.82) : revient progressivement AU CENTRE,
+ *   ralentit exponentiellement et SE POSE (seuls micro-mouvements restent).
+ */
+function Die({ progress }: { progress: number }) {
   const mesh = useRef<Mesh>(null);
   const spring = useRef({ x: 0, z: 0, vx: 0, vz: 0 });
+  const settle = clamp01((progress - 0.82) / 0.18); // ch.06
+  /** Révolution complète déclenchée à l'envoi du contact (story:send). */
+  const revolution = useRef({ active: false, t: 0 });
+
+  useEffect(() => {
+    const onSend = () => {
+      revolution.current.active = true;
+      revolution.current.t = 0;
+    };
+    window.addEventListener('story:send', onSend);
+    return () => window.removeEventListener('story:send', onSend);
+  }, []);
 
   useFrame((state, delta) => {
     if (!mesh.current) return;
     const d = Math.min(delta, 0.05);
-    // Le scroll est le vent : plus il est rapide, plus le dé tourne vite.
-    const boost = Math.min(3, Math.abs(scrollState.velocity) / 900);
-    mesh.current.rotation.y += d * (0.15 + boost * 0.55);
 
-    // Face lumineuse : suit le pointeur avec inertie (spring amorti).
+    // Révolution : un tour complet en 1 s (ease inOut), puis retour au calme.
+    if (revolution.current.active) {
+      revolution.current.t += d / 1.0;
+      if (revolution.current.t >= 1) revolution.current.active = false;
+      const r = revolution.current.t;
+      const eased = r < 0.5 ? 2 * r * r : 1 - Math.pow(-2 * r + 2, 2) / 2;
+      mesh.current.rotation.y = eased * Math.PI * 2;
+      return; // pendant la révolution, on gèle le reste
+    }
+
+    // Vent du scroll, amorti au repos final.
+    const boost = Math.min(3, Math.abs(scrollState.velocity) / 900);
+    mesh.current.rotation.y += d * (0.15 + boost * 0.55) * (1 - settle * 0.92);
+
+    // Face lumineuse : suit le pointeur avec inertie (spring amorti),
+    // encore atténué quand le dé s'est posé.
     const s = spring.current;
     const k = 6;
-    s.vx += (state.pointer.y * 0.4 - s.x) * k * d;
+    s.vx += (state.pointer.y * 0.4 - s.x) * k * d * (1 - settle * 0.8);
     s.vx *= Math.max(0, 1 - 4.2 * d);
     s.x += s.vx * d * 8;
-    s.vz += (state.pointer.x * 0.25 - s.z) * k * d;
+    s.vz += (state.pointer.x * 0.25 - s.z) * k * d * (1 - settle * 0.8);
     s.vz *= Math.max(0, 1 - 4.2 * d);
     s.z += s.vz * d * 8;
     mesh.current.rotation.x = s.x;
@@ -174,20 +216,42 @@ function Stage({ quality, opened }: { quality: 'high' | 'low'; opened: boolean }
   const group = useRef<Group>(null);
   const smooth = useRef(0);
 
-  useFrame((_, delta) => {
+  useFrame(({ camera }, delta) => {
     if (!group.current) return;
-    smooth.current = MathUtils.damp(smooth.current, scrollState.global, 4, Math.min(delta, 0.05));
+    const d = Math.min(delta, 0.05);
+    smooth.current = MathUtils.damp(smooth.current, scrollState.global, 4, d);
     group.current.position.y = (smooth.current - 0.5) * -0.9;
+
+    // Caméra suit le dé au début du récit : légère descente/ré-remontée
+    // (suivi doux des 320 premiers px, exactement la phase chute+rebond).
+    const settle = clamp01((smooth.current - 0.82) / 0.18);
+    const driftX = 2.4 - smooth.current * 1.8 + settle * 1.8; // revient à ~2.4 au ch.06 (centre visuel)
+    const targetX = driftX;
+    camera.position.x = MathUtils.damp(camera.position.x, targetX * 0.12, 3, d);
+
+    // Le dé : position X avec chute initiale + recentrage ch.06.
+    const dieGroup = dieRef.current;
+    if (dieGroup) {
+      const drop = computeDropOffset(window.scrollY);
+      dieGroup.position.x = driftX;
+      dieGroup.position.y = 0.3 + drop + settle * 0.15;
+    }
   });
+
+  const dieRef = useRef<Group>(null);
 
   return (
     <group ref={group}>
-      <group position={[2.4, 0.3, 0]}>
+      <group ref={dieRef} position={[2.4, 0.3, 0]}>
         {!opened ? (
           <DieOpening opened={opened} />
         ) : (
-          <Float speed={1.4} rotationIntensity={0.2} floatIntensity={0.9}>
-            <Die />
+          <Float
+            speed={1.4 - clamp01(smooth.current) * 0.9}
+            rotationIntensity={0.2}
+            floatIntensity={0.9 - clamp01(smooth.current) * 0.6}
+          >
+            <Die progress={smooth.current} />
           </Float>
         )}
       </group>
@@ -195,8 +259,8 @@ function Stage({ quality, opened }: { quality: 'high' | 'low'; opened: boolean }
       {/* Sphère céramique ch.02 (facettes révélées séquentiellement) —
           remplace l'orb de la recette satellites si quality high. */}
       {quality === 'high' && opened && <CeramicOrb position={[-3.8, 0, -2.5]} />}
-      {/* Migration cubique ch.03 → ch.04 */}
-      {opened && <ToolCubes position={[0, 0, -1.2]} />}
+      {/* Migration cubique ch.03 → ch.04 (edges prop = logotypes réels) */}
+      {opened && <ToolCubes position={[0, 0, -1.2]} tools={techLogos} />}
     </group>
   );
 }

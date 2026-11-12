@@ -75,3 +75,28 @@ export function Manifest({ text, index }: ManifestProps) {
     </section>
   );
 }
+
+/**
+ * Événement 'story:send' (déclenché à l'envoi du contact, ch.06) :
+ * le manifeste 06 « se défait » — les mots remontent en re-floutant,
+ * dans l'ordre inverse, puis se reposent (ré-écriture) ; le dé fait
+ * une révolution complète côté 3D (écouteur dans StoryScene).
+ */
+if (typeof window !== 'undefined') {
+  window.addEventListener('story:send', () => {
+    const last = document.querySelectorAll<HTMLElement>('[data-word]');
+    if (!last.length) return;
+    gsap.fromTo(
+      last,
+      { filter: 'blur(0px)', y: 0, opacity: 1 },
+      {
+        filter: 'blur(6px)',
+        y: -26,
+        opacity: 0.15,
+        stagger: { each: 0.04, from: 'end' },
+        duration: 0.9,
+        ease: 'power2.in',
+      },
+    );
+  });
+}

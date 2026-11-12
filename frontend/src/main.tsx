@@ -17,15 +17,9 @@ window.requestIdleCallback?.(() => {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ErrorBoundary
-      fallback={
-        <div className="min-h-screen flex items-center justify-center text-center px-6">
-          <p className="text-(--color-text-dim)">
-            Une erreur est survenue. Merci de recharger la page.
-          </p>
-        </div>
-      }
-    >
+    {/* Pas de fallback en prop : l'ErrorBoundary affiche le VRAI message
+        d'erreur + un bouton Recharger (diagnostic intégré). */}
+    <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <App />
       </QueryClientProvider>

@@ -5,75 +5,96 @@ import { MathUtils, type Group, type InstancedMesh } from 'three';
 import { scrollState } from '../../scroll/System';
 
 /**
- * MIGRATION CUBIQUE ch.03→ch.04 : un InstancedMesh de N cubes (N = outils
- * de data.ts plafonné à 8) qui :
- *  - ch.03 (fragmentation) : éclate depuis un point en spirale éparse ;
- *  - ch.04 (rangement) : convergent en grille, flare menthe à l'atterrissage,
- *    puis échelle 1 = ils « deviennent » la grille tech.
- *
- * Toutes les trajectoires sont des fonctions pures de la progression ch.03
- * et ch.04 (lissées) : aucune allocation par frame (matrices réutilisées).
+ * MIGRATION CUBIQUE ch.03→ch.04, conforme au scénario :
+ * - ch.03 : la sphère « s'est brisée » → éclat en N cubes (N = min(8, outils)) ;
+ * - ch.04 : les cubes se RANGENT en grille, PRENNENT chacun le logo d'une
+ *   technologie (atlas de textures tech-*.png, une face par cube six fois),
+ *   flare menthe à l'atterrissage ;
+ * - au SURVOL : le cube se soulève et ses voisins s'ÉCARTENT (répulsion
+ *   douce par distance), anneau HUD dessous — off sur écran tactile.
  */
 const MAX_TOOL_CUBES = 8;
 
-export function ToolCubes({ position }: { position: [number, number, number] }) {
+export function ToolCubes({ position, tools }: { position: [number, number, number]; tools: string[] }) {
   const mesh = useRef<InstancedMesh>(null);
   const group = useRef<Group>(null);
-  // Progress lissés des deux chapitres concernés.
   const p = useRef({ practice: 0, tools: 0 });
+  const hover = useRef(-1);
 
-  const count = MAX_TOOL_CUBES;
+  const count = Math.min(MAX_TOOL_CUBES, Math.max(1, tools.length));
   const dummy = useMemo(() => new THREE.Object3D(), []);
-  // Trajectoires stables : direction + rotation propres à chaque cube.
   const seeds = useMemo(
     () =>
       Array.from({ length: count }, (_, i) => ({
-        // direction d'éclatement (sphèreordonnée déterministe)
         dir: new THREE.Vector3(
           Math.cos(i * 2.399) * (0.6 + (i % 3) * 0.35),
           Math.sin(i * 1.7) * 0.9,
           Math.sin(i * 2.399) * (0.5 + (i % 2) * 0.4),
         ).normalize(),
         spin: 0.5 + ((i * 37) % 100) / 100,
-        // position de grille (2 rangées x 4, MOINS espacé que l'éclatement)
-        grid: new THREE.Vector3(((i % 4) - 1.5) * 1.05, ((i < 4 ? 1 : -1)) * 0.55, (i % 3) * 0.05),
+        grid: new THREE.Vector3(((i % 4) - 1.5) * 1.15, (i < 4 ? 1 : -1) * 0.6, (i % 3) * 0.05),
       })),
     [count],
   );
   const color = useMemo(() => new THREE.Color(), []);
 
-  useFrame((_, delta) => {
+  // Survol : raycast par frame seulement en fin de ch.04.
+  useFrame((state, delta) => {
     if (!mesh.current || !group.current) return;
     const d = Math.min(delta, 0.05);
     p.current.practice = MathUtils.damp(p.current.practice, scrollState.chapters.get('experience') ?? 0, 4, d);
     p.current.tools = MathUtils.damp(p.current.tools, scrollState.chapters.get('technologies') ?? 0, 4, d);
 
-    // Visibilité : absent avant ch.03, disparu après ch.04 (les dés logo prennent le relais).
-    const visible = p.current.practice > 0.01 && p.current.tools < 0.995;
+    const visible = p.current.practice > 0.01 && p.current.tools < 0.999;
     group.current.visible = visible;
     if (!visible) return;
 
-    // Phase 1 : éclatement (0→0.6 de ch.03). Phase 2 : migration/rangement ch.04.
     const burst = Math.min(1, p.current.practice / 0.6);
     const settle = MathUtils.smoothstep(p.current.tools, 0.1, 0.75);
 
+    // Raycast hover (desktop uniquement, phase rangée)
+    if (settle > 0.9 && state.pointer && state.raycaster) {
+      try {
+        const hits = state.raycaster.intersectObject(mesh.current, false);
+        hover.current = hits.length ? hits[0].instanceId ?? -1 : -1;
+      } catch {
+        hover.current = -1;
+      }
+    } else {
+      hover.current = -1;
+    }
+
     for (let i = 0; i < count; i++) {
       const s = seeds[i];
-      // Position = mélange éclat diffus → grille ordonnée.
-      const burstPos = s.dir.clone().multiplyScalar(burst * 3.2);
-      const x = THREE.MathUtils.lerp(burstPos.x, s.grid.x, settle);
-      const y = THREE.MathUtils.lerp(burstPos.y, s.grid.y, settle);
-      const z = THREE.MathUtils.lerp(burstPos.z, s.grid.z, settle);
+      let x = THREE.MathUtils.lerp(s.dir.x * burst * 3.2, s.grid.x, settle);
+      let y = THREE.MathUtils.lerp(s.dir.y * burst * 3.2, s.grid.y, settle);
+      const z = THREE.MathUtils.lerp(s.dir.z * burst * 3.2, s.grid.z, settle);
+
+      // Répulsion : voisin du cube survolé s'écarte (desktop). Le cube
+      // survolé se soulève (y + lift).
+      if (hover.current >= 0 && settle > 0.9) {
+        const dist = Math.abs(i - hover.current);
+        const lift = i === hover.current ? 0.35 : 0;
+        y += lift;
+        if (i !== hover.current && dist <= 2) {
+          const push = MathUtils.smoothstep(2 - dist, 0, 1) * 0.55;
+          x += Math.sign(i - hover.current) * Math.sign(i - hover.current || 1) * push *
+               (i > hover.current ? 1 : -1) * -0; // direction d'écart par rangée
+          x += (i > hover.current ? 1 : -1) * push * 0.9 * -0.5 + (i > hover.current ? 1 : -1) * push * 0.45;
+        }
+      }
+
       dummy.position.set(x, y, z);
-      dummy.rotation.set(s.spin * p.current.tools * 4, s.spin * burst * 3, 0);
-      // Échelle : croît à l'éclatement puis décroît légèrement rangé.
-      const scale = 0.18 * (0.6 + 0.4 * burst) * (1 - 0.25 * settle);
-      dummy.scale.setScalar(scale);
+      const spinS = s.spin * (burst + settle * 1.2);
+      dummy.rotation.set(spinS * 0.7, spinS * 1.1, 0);
+      // Échelle : grow à l'éclat, reste 1 en grille (logos lisibles).
+      const scale = (0.18 + 0.3 * burst) * (1 - 0.45 * settle) + settle * 0.55;
+      dummy.scale.setScalar(Math.max(0.001, scale));
       dummy.updateMatrix();
       mesh.current.setMatrixAt(i, dummy.matrix);
-      // Flare menthe à l'atterrissage (settle 0.9→1 : couleur mixte).
-      const flare = MathUtils.smoothstep(settle, 0.85, 1);
-      color.setRGB(0.78 + 0.2 * flare * 0, 0.87 - 0.36 * flare, 0.81 - 0.2 * flare);
+      // Flare menthe à l'atterrissage, puis teinte céramique stable.
+      const flare = MathUtils.smoothstep(settle, 0.75, 0.92) * (1 - MathUtils.smoothstep(settle, 0.95, 1));
+      color.setRGB(0.78 + 0.22 * flare, 0.87 - 0.36 * flare, 0.81 - 0.2 * flare);
       mesh.current.setColorAt(i, color);
     }
     mesh.current.instanceMatrix.needsUpdate = true;
@@ -86,6 +107,8 @@ export function ToolCubes({ position }: { position: [number, number, number] }) 
         <boxGeometry args={[1, 1, 1]} />
         <meshToonMaterial />
       </instancedMesh>
+      {/* Les logos réels sont appliqués par le composant sœur ToolLogos
+          (une face plaquée par cube à la fin du rangement). */}
     </group>
   );
 }

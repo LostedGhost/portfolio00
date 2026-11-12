@@ -47,3 +47,18 @@
   les SVG specimens (coche, anneaux) ; cartes-volets rotateY pour échos.
 - Voix éditoriale : microtextes repris (CTA, labels du contact, états
   vides) — voir diff dans le commit de l'étape.
+
+## Étape 2 (complément) — Preloader & DieOpening
+
+Commité APRÈS l'étape 5 (ordre de dépendance technique : les liants avaient
+besoin du flag `opened` fourni ici), mais présenté d'abord dans le récit.
+Choix : DieOpening = 6 planes MeshBasicMaterial (pas 6 sous-mesh de boîte)
+pour éviter le z-fighting, DoubleSide le temps de l'assemblage ; bascule
+vers le dé opaque via prop `opened` (le preloader terminé).
+Liseré `body { overflow: hidden }` pendant le chargement.
+
+## Ordre des commits
+
+de5a301 → a7bcd6c → 56676b7 → 83cd426 → 4191b13 (preloader, dépendant des
+liants ; aucun rebase risqué de fait, la lecture chronologique des diffs
+reste claire).
