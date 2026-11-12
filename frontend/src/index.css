@@ -5,16 +5,14 @@
   --font-body: "Inter", "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  --color-bg: #05050f;
-  --color-surface: #0a0a20;
-  /* One dominant accent for nearly all UI. Violet is a rare second voice —
-     the hero glow and one or two hovers — not a gradient slapped on every
-     heading/button/border. */
-  --color-accent: #00aaff;
-  --color-violet: #7b2fff;
-  --color-text: #e8e8f0;
-  --color-text-dim: #9a9ab0;
-  --color-border: rgba(232, 232, 240, 0.12);
+  /* Palette narrative — noir-teinté-vert + néon menthe (bible §4) */
+  --color-bg: #070c09;
+  --color-surface: #122017;
+  --color-accent: #57ff9a;
+  --color-violet: #4fc3f7;
+  --color-text: #eaf5ee;
+  --color-text-dim: #93a89b;
+  --color-border: rgba(234, 245, 238, 0.12);
 }
 
 html {
@@ -70,4 +68,57 @@ h1, h2, h3, h4 {
   .section {
     padding: 8rem 2rem;
   }
+}
+
+/* ---- Animations du récit ---- */
+@keyframes letter-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes scroll-hint {
+  0% { transform: translateY(150%); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translateY(90%); opacity: 0; }
+}
+
+/* ---- Glisse (verre liquide) : thème sombre du portfolio ----
+   glisse pose data-theme="dark" sur <body> via index.html ; on aligne le
+   verre sur la palette du site (bleu nuit, bord discret) au lieu du gris
+   Apple par défaut. */
+:where([data-theme='dark']) {
+  --lg-glass: rgba(12, 12, 34, 0.5);
+  --lg-glass-active: rgba(24, 24, 52, 0.7);
+  --lg-edge: rgba(232, 232, 240, 0.14);
+  --lg-drop: rgba(0, 0, 0, 0.4);
+  --lg-foreground: #e8e8f0;
+  --lg-muted: #9a9ab0;
+  --lg-rim-shine: 0.25;
+  --lg-lens-shine: 1;
+}
+
+.lg-glass {
+  /* Lisibilité : le verre de glisse est clair par défaut sur un site opaque ;
+     centré sombre ici pour rester fidèle au design d'origine. */
+  color: var(--color-text);
+}
+
+/* Modal projet : scrollbar discrète (celle du site, cyan 10px, est trop
+   intrusive dans une fiche). */
+.modal-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-scroll::-webkit-scrollbar-thumb {
+  background: rgba(232, 232, 240, 0.25);
+}
+.modal-scroll::-webkit-scrollbar-track {
+  background: transparent;
 }

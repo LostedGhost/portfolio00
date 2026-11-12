@@ -19,7 +19,11 @@
     <meta name="author" content="Ludel S. G. TOPANOU" />
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://www.graciotopanou.online/" />
-    <meta name="theme-color" content="#05050f" />
+    <!-- Fond immédiat + thème glisse, avant tout rendu -->
+    <style>
+      html { background: #070c09; }
+    </style>
+    <meta name="theme-color" content="#070c09" />
 
     <!-- Favicons -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -63,7 +67,7 @@
       }
     </script>
   </head>
-  <body>
+  <body data-theme="dark">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
