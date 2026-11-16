@@ -1,73 +1,136 @@
 @import "tailwindcss";
 
-@theme {
-  --font-display: "Itim", "Segoe UI", cursive;
-  --font-body: "Inter", "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+/* Le mode sombre suit le système (prefers-color-scheme). */
 
-  --color-bg: #05050f;
-  --color-surface: #0a0a20;
-  /* One dominant accent for nearly all UI. Violet is a rare second voice —
-     the hero glow and one or two hovers — not a gradient slapped on every
-     heading/button/border. */
-  --color-accent: #00aaff;
-  --color-violet: #7b2fff;
-  --color-text: #e8e8f0;
-  --color-text-dim: #9a9ab0;
-  --color-border: rgba(232, 232, 240, 0.12);
-}
+/* ==========================================================================
+   Charte « émeraude & verre » (light + dark)
+   - Le texte courant reste sur --fg / --head (contraste AA garanti).
+   - L'émeraude sert aux icônes, aplats, liserés et accents.
+   ========================================================================== */
+@theme inline {
+  --font-display: "Rubik", "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "DM Sans", system-ui, "Segoe UI", Arial, sans-serif;
 
-html {
-  scroll-behavior: smooth;
-}
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-head: var(--head);
+  --color-muted: var(--muted);
+  --color-em: #10b981;
+  --color-em2: #34d399;
+  --color-em3: #a7f3d0;
+  --color-deep: #022c22;
+  --color-forest: #064e3b;
+  --color-glass: var(--glass);
+  --color-glass-b: var(--glass-b);
+  --color-field: var(--field);
 
-body {
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  overflow-x: hidden;
-}
-
-h1, h2, h3, h4 {
-  font-family: var(--font-display);
+  --ease-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-::selection {
-  background: var(--color-accent);
-  color: #05050f;
+:root {
+  color-scheme: light dark;
+  --bg: #ecfdf5;
+  --fg: #064e3b;
+  --head: #064e3b;
+  --muted: #2f6b57;
+  --h1: #f0fdf6;
+  --h2: #bbf7d0;
+  --h3: #6ee7b7;
+  --glass: rgb(255 255 255 / 0.42);
+  --glass-b: rgb(255 255 255 / 0.75);
+  --glass-s: rgb(6 78 59 / 0.16);
+  --field: rgb(255 255 255 / 0.6);
 }
 
-::-webkit-scrollbar {
-  width: 10px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-bg);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--color-accent);
-}
-
-.glass {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--color-border);
-  backdrop-filter: blur(12px);
-}
-
-.section {
-  padding: 6rem 1.5rem;
-  max-width: 1120px;
-  margin: 0 auto;
-}
-
-.eyebrow {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-  color: var(--color-accent);
-}
-
-@media (min-width: 768px) {
-  .section {
-    padding: 8rem 2rem;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #03140f;
+    --fg: #c9f5de;
+    --head: #ecfdf5;
+    --muted: #9fd8bd;
+    --h1: #052e22;
+    --h2: #064e3b;
+    --h3: #047857;
+    --glass: rgb(255 255 255 / 0.07);
+    --glass-b: rgb(255 255 255 / 0.18);
+    --glass-s: rgb(0 0 0 / 0.4);
+    --field: rgb(255 255 255 / 0.08);
   }
+}
+
+@layer base {
+  html { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; background: var(--bg); }
+  body { color: var(--fg); font-size: 1.1rem; line-height: 1.6; overflow-x: hidden; }
+  h1, h2, h3 { font-family: var(--font-display); color: var(--head); line-height: 1; letter-spacing: -0.02em; }
+  ::selection { background: var(--color-em2); color: var(--color-deep); }
+  :focus-visible { outline: 3px solid var(--color-em); outline-offset: 3px; border-radius: 6px; }
+}
+
+@layer components {
+  /* Verre dépoli */
+  .glass {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(22px) saturate(180%);
+    backdrop-filter: blur(22px) saturate(180%);
+    border: 1px solid var(--glass-b);
+    box-shadow: inset 0 1px 0 var(--glass-b), 0 12px 40px var(--glass-s);
+  }
+  /* Pastille verre sur fond coloré (cartes projets) */
+  .pill-glass {
+    background: rgb(255 255 255 / 0.4);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgb(255 255 255 / 0.7);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
+  }
+  /* Dégradé du hero et du pied de page */
+  .aurora { background: linear-gradient(160deg, var(--h1), var(--h2) 62%, var(--h3)); }
+  /* Lettres en dégradé (nom géant) */
+  .grad-text {
+    background: linear-gradient(180deg, var(--head) 35%, var(--color-em));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* Mot mis en valeur : surlignage émeraude */
+  .em-mark {
+    color: var(--head);
+    background-image: linear-gradient(transparent 62%, rgb(52 211 153 / 0.45) 62%, rgb(52 211 153 / 0.45) 92%, transparent 92%);
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    padding-inline: 0.05em;
+  }
+}
+
+/* Lenis */
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+
+/* Lien « roulement de lettres » */
+.roll { display: inline-flex; overflow: hidden; line-height: 1.25; }
+.roll-ch { position: relative; display: inline-block; white-space: pre; }
+.roll-ch > span { display: block; transition: transform .6s var(--ease-expo); transition-delay: calc(var(--i) * 14ms); }
+.roll-ch > span + span { position: absolute; inset: 0; transform: translateY(100%); }
+@media (hover: hover) {
+  .roll-host:hover .roll-ch > span { transform: translateY(-100%); }
+  .roll-host:hover .roll-ch > span + span { transform: translateY(0); }
+}
+
+/* Bandeau d'outils qui défile */
+@keyframes marquee { to { transform: translateX(-50%); } }
+.marquee { animation: marquee 38s linear infinite; }
+@media (hover: hover) { .marquee-host:hover .marquee { animation-play-state: paused; } }
+
+/* Carrousel d'images de projet */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Scanner du pointage facial */
+.face-scan { transition: top 1.4s ease-in-out; }
+.group:hover .face-scan, .group:focus-within .face-scan { top: 88%; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }

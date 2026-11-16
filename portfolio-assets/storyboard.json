@@ -1,0 +1,78 @@
+{
+  "projet": "Portfolio Ludel — édition narrative",
+  "bible": "portfolio-assets/bible.md",
+  "cree": "2026-11-12",
+  "plans": [
+    {
+      "id": "s01-hero",
+      "intention": "													Poser le ton : calme, technique, une signature lumineuse. Le dé tourne doucement, contenu centré massif.",
+      "cadrage": "hero plein écran, objet 3D à droite (desktop) / derrière le texte (mobile, opacité réduite)",
+      "texte": "01 — Un développeur construit des outils simples. Ludel S. G. TOPANOU, full-stack & data. CTA : « Découvrir l'histoire ↓ »",
+      "source": "code",
+      "animation": "dé rotation lente + surge au scroll ; titre apparaît en 2 temps (opacité/translate) ; scroll-indicator mono clignotant",
+      "duree_s": 8,
+      "statut": "a_faire"
+    },
+    {
+      "id": "s02-manifeste-1",
+      "intention": "Révéler le manifeste chapitre 02 mot à mot avec le scroll (Luke Baffait).",
+      "cadrage": "texte massif centré, espaces négatifs",
+      "texte": "Le chemin — « J'apprends à construire, puis à construire mieux. »",
+      "source": "code",
+      "animation": "révélation mot-par-mot liée à scroll (opacity + blur), rAF throttlé",
+      "statut": "a_faire"
+    },
+    {
+      "id": "s03-a-propos",
+      "intention": "Convaincre : parcours + chiffres + compétences, habillage discret.",
+      "cadrage": "deux colonnes asymétriques, image illustrative sans fond à droite",
+      "texte": "description data.ts, stats compteurs, barres de compétences",
+      "source": "stock_ou_code",
+      "requête_stock": "isometric 3d object pastel (openverse, CC0)",
+      "animation": "parallaxe douce de l'illustration (translateY au scroll), counters animés one-shot",
+      "statut": "a_faire"
+    },
+    {
+      "id": "s04-experience",
+      "intention": "Prouver la pratique : timeline habillée, manifeste chapitre 03.",
+      "texte": "« Le code qui compte est celui qu'on livre. » + expériences data.ts",
+      "source": "code",
+      "animation": "timeline : ligne qui se dessine (scaleY) au scroll, items staggered 80ms",
+      "statut": "a_faire"
+    },
+    {
+      "id": "s05-technologies",
+      "intention": "Instruments : les cubes réutilisés, palette recolorée menthe, plus sobres.",
+      "texte": "« Peu d'outils, maîtrisés. » + techs data.ts",
+      "source": "code",
+      "animation": "cubes r3f existants recolorés + léger accélération, fallback chips verre",
+      "statut": "a_faire"
+    },
+    {
+      "id": "s06-projets",
+      "intention": "Les preuves : grille aérée, images harmonisées, manifeste chapitre 05.",
+      "texte": "« Des interfaces que des gens réels utilisent chaque jour. » + projets data.ts",
+      "source": "code",
+      "animation": "cartes reveal staggered, hover lift doux, modal verre existante",
+      "statut": "a_faire"
+    },
+    {
+      "id": "s07-temoignages",
+      "intention": "Voix extérieures : sobres, une carte par témoignage.",
+      "texte": "testimonials data.ts",
+      "source": "code",
+      "animation": "apparition douce (opacité/translate) au viewport",
+      "statut": "a_faire"
+    },
+    {
+      "id": "s08-contact",
+      "intention": "La continuité : invitation, manifeste chapitre 06, contact minimal + footer.",
+      "texte": "« La meilleure histoire est celle qu'on écrit ensemble. » + contact data.ts",
+      "source": "code",
+      "animation": "formulaire verre existant conservé, dé « s'ouvre » (rotation 180° + glow) au viewport",
+      "statut": "a_faire"
+    }
+  ],
+  "images_stock_candidats": [],
+  "notes": "Bilan (2026-11-12) : Openverse n'a pas fourni d'illustrations cohérentes style Cyera → plan B retenu : illustrations SVG faites main (story/specimens/Illustration.tsx), licence 100 % maison, style sous contrôle. Intégration terminée : 6 chapitres + interlude échos, fond 3D continu photosensible au scroll, manifestes parallaxe mot-à-mot, rail de progression. Fluidité mesurée : 60 FPS en scroll continu. Reste pour le propriétaire : (1) fournir ses vraies infos data.ts, (2) validter visuellement sur navigateur sain (WebGL NEO actuel perdu)."
+}

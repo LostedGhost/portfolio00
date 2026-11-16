@@ -1,32 +1,54 @@
-# React + TypeScript + Vite
+# Portfolio — Ludel Topanou
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Site **100 % statique** (aucun backend) : React 19 + Vite + Tailwind 4 + GSAP/ScrollTrigger + Lenis.
+`npm run build` produit `dist/`, servi tel quel par Vercel.
 
-Currently, two official plugins are available:
+## Mettre le contenu à jour
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Tout le contenu est dans **`src/config/portfolio.ts`** : identité, textes, compétences, projets, méthode, contact.
 
-## React Compiler
+- **Photo / logo** : déposez le fichier dans `public/images/`, puis renseignez `site.photo` / `site.logo`
+  (ex. `'/images/photo.webp'`). Vide = illustration / initiales.
+- **Captures d'un projet** : `images: ['/images/suivicm-1.webp', …]` sur le projet → un carrousel apparaît.
+- **Lien d'un projet** : `link.href` (externe) ou `link.ask` (ouvre le formulaire prérempli).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Architecture (reprise du site-commune)
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```
+src/
+├── config/portfolio.ts   # ★ seul fichier de contenu
+├── lib/
+│   ├── motion.ts         # GSAP + ScrollTrigger + Lenis, mouvement réduit, scrollToId
+│   └── utils.ts          # cn()
+├── components/           # briques réutilisables (icon, brand, roll-link, split-letters,
+│                         #   scroll-text-reveal, progress-rail, project-visual)
+├── sections/             # un fichier par chapitre, dans l'ordre de App.tsx
+│   ├── preloader.tsx     # compteur 000→100, rideau
+│   ├── nav.tsx           # pilule de verre, apparaît après le hero
+│   ├── hero.tsx          # nom géant qui explose au défilement (épinglé)
+│   ├── about.tsx         # intro révélée au scroll, faits, portrait, compétences
+│   ├── tools-marquee.tsx # bandeau d'outils
+│   ├── projects.tsx      # cartes empilées qui se tassent
+│   ├── method.tsx        # méthode spec-first, ligne lumineuse
+│   └── contact-footer.tsx# formulaire mailto + signature géante
+├── App.tsx
+└── index.css             # charte émeraude & verre (clair + sombre automatique)
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Formulaire de contact
+
+Sans backend : il ouvre la messagerie du visiteur avec un e-mail prêt à envoyer à `site.email`.
+
+## Commandes
+
+```bash
+npm install
+npm run dev      # développement
+npm run build    # vérification TypeScript + build de production
+npm run lint     # oxlint
+```
+
+## Déploiement Vercel
+
+`vercel.json` (dans `frontend/`) fixe le framework Vite, la sortie `dist/` et le cache long des assets.
+Le projet Vercel doit avoir **Root Directory = `frontend`** (comme avant).
