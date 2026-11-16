@@ -26,6 +26,9 @@ const github = (
 
 export type IconName = keyof typeof paths | 'gh'
 
+/** Noms valides, pour vérifier les données chargées au démarrage. */
+export const iconNames = [...Object.keys(paths), 'gh'] as IconName[]
+
 type Props = { name: IconName } & SVGProps<SVGSVGElement>
 
 export function Icon({ name, className = 'size-[1.35em]', ...rest }: Props) {

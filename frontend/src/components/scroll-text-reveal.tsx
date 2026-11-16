@@ -3,16 +3,27 @@ import { gsap, useGSAP, prefersReducedMotion } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 
 type Props = {
+  /** Texte ; les passages entre *astérisques* sont mis en valeur. */
   text: string
   className?: string
-  /** Indices des mots mis en valeur (surlignage émeraude). */
-  emphasis?: number[]
+}
+
+/** Découpe en mots en repérant les passages *mis en valeur* (même sur plusieurs mots). */
+function parse(text: string) {
+  let on = false
+  return text.split(/\s+/).filter(Boolean).map((raw) => {
+    let w = raw
+    let em = on
+    if (w.startsWith('*')) { em = true; on = true; w = w.slice(1) }
+    if (w.endsWith('*')) { on = false; w = w.slice(0, -1) }
+    return { w, em }
+  }).filter((x) => x.w)
 }
 
 /** Paragraphe qui sort du flou mot à mot, au rythme du défilement (scrub). */
-export function ScrollTextReveal({ text, className, emphasis = [] }: Props) {
+export function ScrollTextReveal({ text, className }: Props) {
   const ref = useRef<HTMLParagraphElement>(null)
-  const words = text.split(/\s+/)
+  const words = parse(text)
 
   useGSAP(() => {
     const el = ref.current
@@ -26,10 +37,10 @@ export function ScrollTextReveal({ text, className, emphasis = [] }: Props) {
 
   return (
     <p ref={ref} className={className}>
-      <span className="sr-only">{text}</span>
-      {words.map((w, i) => (
+      <span className="sr-only">{text.replaceAll('*', '')}</span>
+      {words.map(({ w, em }, i) => (
         <span key={i} aria-hidden="true">
-          <span data-unit className={cn('inline-block will-change-[filter,opacity]', emphasis.includes(i) && 'em-mark')}>{w}</span>
+          <span data-unit className={cn('inline-block will-change-[filter,opacity]', em && 'em-mark')}>{w}</span>
           {i < words.length - 1 && ' '}
         </span>
       ))}

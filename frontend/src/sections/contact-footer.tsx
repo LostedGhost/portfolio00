@@ -6,6 +6,9 @@ import { Icon } from '@/components/icon'
 import { RollLink } from '@/components/roll-link'
 import { ASK_EVENT } from '@/sections/projects'
 
+const isExternal = (href: string) => /^https?:\/\//.test(href)
+const ext = (href: string) => (isExternal(href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})
+
 const field = 'w-full rounded-2xl border border-glass-b bg-field px-4 py-3.5 text-fg shadow-[inset_0_2px_6px_rgb(6_78_59/0.08)] placeholder:text-muted/70'
 const label = 'grid gap-1.5 font-display text-[0.98rem] font-medium text-head'
 
@@ -68,7 +71,8 @@ export function ContactFooter() {
     if (prefersReducedMotion()) return
     gsap.from('[data-ctitle] > span', { yPercent: 100, duration: 1.1, ease: 'expo.out', stagger: 0.05, scrollTrigger: { trigger: '[data-ctitle]', start: 'top 85%' } })
     gsap.from('[data-form]', { y: 60, opacity: 0, duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: '[data-form]', start: 'top 90%' } })
-    gsap.fromTo('[data-sign]', { yPercent: 60 }, { yPercent: 0, ease: 'none', scrollTrigger: { trigger: '[data-footer]', start: 'top bottom', end: 'bottom bottom', scrub: true } })
+    gsap.fromTo('[data-sign]', { yPercent: 100 }, { yPercent: 0, ease: 'none', scrollTrigger: { trigger: '[data-footer]', start: 'top 40%', end: 'bottom bottom', scrub: true } })
+    gsap.from('[data-fline]', { y: 50, opacity: 0, duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: '[data-fline]', start: 'top 85%' } })
   }, { scope: root })
 
   return (
@@ -81,9 +85,11 @@ export function ContactFooter() {
             </h2>
             <p className="max-w-[38em] text-[clamp(1.15rem,2vw,1.5rem)] leading-normal">{contact.text}</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <a href={site.github} target="_blank" rel="noopener noreferrer" className="glass inline-flex items-center gap-2 rounded-full px-5 py-3 font-display font-medium text-head transition-transform hover:-translate-y-0.5">
-                <Icon name="gh" />GitHub<span className="sr-only">(nouvel onglet)</span>
-              </a>
+              {site.links.map((l) => (
+                <a key={l.href} href={l.href} {...ext(l.href)} className="glass inline-flex items-center gap-2 rounded-full px-5 py-3 font-display font-medium text-head transition-transform hover:-translate-y-0.5">
+                  <Icon name={l.icon} />{l.label}{isExternal(l.href) && <span className="sr-only">(nouvel onglet)</span>}
+                </a>
+              ))}
               <a href={`mailto:${site.email}`} className="glass inline-flex items-center gap-2 rounded-full px-5 py-3 font-display font-medium text-head transition-transform hover:-translate-y-0.5">
                 <Icon name="mail" />Écrire directement
               </a>
@@ -93,22 +99,40 @@ export function ContactFooter() {
         </div>
       </section>
 
-      <footer data-footer className="aurora relative overflow-hidden pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)] pt-[clamp(4rem,9vw,7rem)] text-center">
+      {/* Pied de page : un écran entier, la signature géante s'y pose en bas */}
+      <footer data-footer className="aurora relative flex min-h-svh flex-col overflow-hidden px-[clamp(1.2rem,4vw,4rem)] pb-[calc(env(safe-area-inset-bottom,0px)+1.5rem)] pt-[clamp(3rem,7vw,5rem)] text-center">
         <div aria-hidden="true" className="pointer-events-none absolute -left-[8vw] -top-[10vw] size-[42vw] rounded-full bg-em2 opacity-60 blur-[60px]" />
+        <div aria-hidden="true" className="pointer-events-none absolute -bottom-[12vw] -right-[8vw] size-[40vw] rounded-full bg-white opacity-50 blur-[60px] dark:opacity-10" />
+
         <div className="relative z-10">
           <Brand className="mx-auto mb-6" />
-          <nav aria-label="Liens du pied de page" className="glass mx-auto mb-12 flex w-max max-w-[92vw] flex-wrap justify-center gap-1 rounded-full p-1.5 font-display font-medium text-head">
+          <nav aria-label="Liens du pied de page" className="glass mx-auto flex w-max max-w-full flex-wrap justify-center gap-1 rounded-[1.6rem] p-1.5 font-display font-medium text-head sm:rounded-full">
             <RollLink href="#haut" label="Accueil" className="rounded-full px-4 py-2 hover:bg-glass-b" />
+            <RollLink href="#apropos" label="À propos" className="rounded-full px-4 py-2 hover:bg-glass-b" />
             <RollLink href="#projets" label="Projets" className="rounded-full px-4 py-2 hover:bg-glass-b" />
-            <RollLink href={site.github} target="_blank" rel="noopener noreferrer" label="GitHub" className="rounded-full px-4 py-2 hover:bg-glass-b" />
+            {site.links.map((l) => (
+              <RollLink key={l.href} href={l.href} {...ext(l.href)} label={l.label} className="rounded-full px-4 py-2 hover:bg-glass-b" />
+            ))}
             <RollLink href="#contact" label="Contact" className="rounded-full px-4 py-2 hover:bg-glass-b" />
           </nav>
+        </div>
+
+        <div className="relative z-10 my-auto py-12">
+          <p data-fline className="mx-auto max-w-[18ch] font-display text-[clamp(2rem,6vw,5rem)] font-bold leading-[1.02] tracking-tight text-head">
+            {site.role}
+          </p>
+          <a href={`mailto:${site.email}`} className="mt-8 inline-flex items-center gap-2 font-display text-[clamp(1.1rem,2.4vw,1.8rem)] font-medium text-head underline decoration-em2 decoration-[3px] underline-offset-8 transition-opacity hover:opacity-70">
+            {site.email}<Icon name="arrow" className="size-[1em]" />
+          </a>
+        </div>
+
+        <div className="relative z-10">
           <div className="overflow-hidden">
-            <p data-sign aria-hidden="true" className="grad-text mb-6 whitespace-nowrap font-display text-[10vw] font-extrabold uppercase leading-none tracking-[-0.015em]">
+            <p data-sign aria-hidden="true" className="grad-text whitespace-nowrap font-display text-[10vw] font-extrabold uppercase leading-[1.05] tracking-[-0.015em]">
               {site.firstName} {site.lastName}
             </p>
           </div>
-          <small className="text-[0.95rem] text-head opacity-80">© {site.year} {site.firstName} {site.lastName}, {site.country}</small>
+          <small className="mt-4 block text-[0.95rem] text-head opacity-80">© {site.year} {site.firstName} {site.lastName}{site.country && `, ${site.country}`}</small>
         </div>
       </footer>
     </div>

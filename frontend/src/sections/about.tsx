@@ -55,7 +55,7 @@ export function About() {
           <h2 id="about-title" data-title className="mb-6 overflow-hidden pb-2 text-[clamp(2.4rem,6.5vw,5.5rem)] font-bold">
             {about.title.split(' ').map((w, i) => <span key={i} className="mr-[0.25em] inline-block">{w}</span>)}
           </h2>
-          <ScrollTextReveal text={about.intro} emphasis={about.emphasis} className="max-w-[38em] text-[clamp(1.15rem,2vw,1.5rem)] leading-normal" />
+          <ScrollTextReveal text={about.intro} className="max-w-[38em] text-[clamp(1.15rem,2vw,1.5rem)] leading-normal" />
           <div data-facts className="mt-8 grid gap-4">
             {about.facts.map((f) => (
               <div key={f.title} data-fact className="glass flex items-start gap-4 rounded-[1.4rem] px-5 py-4">

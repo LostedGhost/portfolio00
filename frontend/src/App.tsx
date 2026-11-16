@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ScrollTrigger, useReducedMotion, useSmoothScroll } from '@/lib/motion'
 import { Preloader } from '@/sections/preloader'
-import { Nav } from '@/sections/nav'
 import { Hero } from '@/sections/hero'
 import { About } from '@/sections/about'
 import { ToolsMarquee } from '@/sections/tools-marquee'
@@ -9,11 +8,18 @@ import { Projects } from '@/sections/projects'
 import { Method } from '@/sections/method'
 import { ContactFooter } from '@/sections/contact-footer'
 import { ProgressRail } from '@/components/progress-rail'
+import { site } from '@/config/portfolio'
 
 export default function App() {
   const reduced = useReducedMotion()
   const [ready, setReady] = useState(false)
   useSmoothScroll(!reduced)
+
+  // Titre et description de l'onglet issus du fichier de données
+  useEffect(() => {
+    document.title = `${site.firstName} ${site.lastName} — ${site.role}`
+    document.querySelector('meta[name="description"]')?.setAttribute('content', `Portfolio de ${site.firstName} ${site.lastName} : ${site.role}${site.country ? `, ${site.country}` : ''}.`)
+  }, [])
 
   // Pas de défilement pendant le prologue
   useEffect(() => {
@@ -30,7 +36,6 @@ export default function App() {
       </a>
       {!ready && <Preloader onDone={done} />}
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(40vw_40vw_at_10%_20%,rgb(52_211_153/0.35),transparent_70%),radial-gradient(45vw_45vw_at_90%_60%,rgb(110_231_183/0.4),transparent_70%),radial-gradient(35vw_35vw_at_30%_95%,rgb(16_185_129/0.25),transparent_70%)] dark:opacity-40" />
-      <Nav />
       <ProgressRail />
       <Hero ready={ready} />
       <main id="contenu">
