@@ -1,28 +1,15 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App.tsx'
-import { ErrorBoundary } from './components/shared/ErrorBoundary.tsx'
 import './index.css'
+import App from './App.tsx'
 
-const queryClient = new QueryClient()
-
-// Préchargement en idle des chunks paresseux (scène 3D outils, projets) :
-// prêts avant que l'utilisateur n'atteigne ces chapitres, sans retarder
-// le premier rendu.
-window.requestIdleCallback?.(() => {
-  void import('./story/chapters/ChapterTools');
-  void import('./story/chapters/ChapterProof');
-});
+// Le récit commence toujours au début : on empêche le navigateur de restaurer
+// l'ancienne position AVANT que Lenis et ScrollTrigger ne s'initialisent.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+window.scrollTo(0, 0)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {/* Pas de fallback en prop : l'ErrorBoundary affiche le VRAI message
-        d'erreur + un bouton Recharger (diagnostic intégré). */}
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <App />
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <App />
   </StrictMode>,
 )

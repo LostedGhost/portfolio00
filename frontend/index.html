@@ -2,116 +2,57 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Ludel Topanou, développeur fullstack</title>
+    <meta name="description" content="Portfolio de Ludel Topanou (Lucio), développeur fullstack, data analyst et designer au Bénin. API REST, interfaces claires, IA et automatisation." />
+    <meta name="author" content="Ludel Topanou" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://www.graciotopanou.online/" />
+    <meta name="theme-color" content="#ecfdf5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#03140f" media="(prefers-color-scheme: dark)" />
+    <style>html{background:#ecfdf5}@media (prefers-color-scheme:dark){html{background:#03140f}}</style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Itim&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet" />
 
-    <title>Ludel S. G. TOPANOU — Développeur web full-stack & Data analyst</title>
-    <meta
-      name="description"
-      content="Portfolio de Ludel S. G. TOPANOU, développeur back-end specialise en Django, Spring Boot, MongoDB et PostgreSQL. Experimente en API REST, optimisation des bases de donnees, CI/CD et Intelligence Artificielle."
-    />
-    <meta name="author" content="Ludel S. G. TOPANOU" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://www.graciotopanou.online/" />
-    <!-- Fond immédiat + thème glisse, avant tout rendu -->
-    <style>
-      html { background: #070c09; }
-    </style>
-    <meta name="theme-color" content="#070c09" />
-
-    <!-- Favicons -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Ludel S. G. TOPANOU — Portfolio" />
+    <meta property="og:site_name" content="Ludel Topanou — Portfolio" />
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:url" content="https://www.graciotopanou.online/" />
-    <meta property="og:title" content="Ludel S. G. TOPANOU — Développeur web full-stack & Data analyst" />
-    <meta
-      property="og:description"
-      content="Portfolio de Ludel S. G. TOPANOU, developpeur back-end specialise en Django, Spring Boot, MongoDB et PostgreSQL."
-    />
+    <meta property="og:title" content="Ludel Topanou, développeur fullstack" />
+    <meta property="og:description" content="Développeur fullstack, data analyst et designer au Bénin." />
     <meta property="og:image" content="https://www.graciotopanou.online/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-
-    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Ludel S. G. TOPANOU — Développeur web full-stack & Data analyst" />
-    <meta
-      name="twitter:description"
-      content="Portfolio de Ludel S. G. TOPANOU, developpeur back-end specialise en Django, Spring Boot, MongoDB et PostgreSQL."
-    />
+    <meta name="twitter:title" content="Ludel Topanou, développeur fullstack" />
+    <meta name="twitter:description" content="Développeur fullstack, data analyst et designer au Bénin." />
     <meta name="twitter:image" content="https://www.graciotopanou.online/og-image.png" />
 
-    <script type="application/ld+json" id="ld-json-person">
+    <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "Person",
-        "name": "Ludel S. G. TOPANOU",
-        "jobTitle": "Developpeur web full-stack & Data analyst",
+        "name": "Ludel Topanou",
+        "alternateName": "Lucio",
+        "jobTitle": "Développeur fullstack",
         "url": "https://www.graciotopanou.online/",
         "image": "https://www.graciotopanou.online/og-image.png",
-        "knowsAbout": ["Django", "React", "PostgreSQL", "MongoDB", "Spring Boot", "API REST"]
+        "address": { "@type": "PostalAddress", "addressCountry": "BJ" },
+        "sameAs": ["https://github.com/LostedGhost"],
+        "knowsAbout": ["React", "Next.js", "Django", "FastAPI", "PostgreSQL", "API REST", "Data analyse", "IA"]
       }
     </script>
   </head>
-  <body data-theme="dark">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-
-    <!-- DIAGNOSTIC COMPLET (à retirer une fois le bug trouvé) : capture
-         TOUTES les erreurs JS + les rejets de promesse, les affiche en
-         overlay fixe, et les envoie au serveur via /__log (optionnel). -->
-    <script>
-      (function () {
-        var box = null;
-        function show(title, detail) {
-          if (!box) {
-            box = document.createElement('div');
-            box.style.cssText =
-              'position:fixed;left:0;right:0;bottom:0;z-index:99999;background:rgba(7,12,9,.96);' +
-              'color:#eaf5ee;font:11px/1.5 monospace;padding:10px 14px;max-height:45vh;overflow:auto;' +
-              'border-top:2px solid #57ff9a;white-space:pre-wrap';
-            document.body.appendChild(box);
-          }
-          box.textContent += title + '\n' + (detail || '') + '\n\n';
-        }
-        window.addEventListener('error', function (e) {
-          show('ERREUR JS: ' + (e.message || e), e.error && e.error.stack);
-        });
-        window.addEventListener('unhandledrejection', function (e) {
-          var r = e.reason;
-          show('PROMESSE REJETÉE:', r && (r.stack || r.message) ? String(r.stack || r.message) : String(r));
-        });
-        // Outil scroll : mesure la réactivité en direct (coin bas droit).
-        window.addEventListener('load', function () {
-          var m = document.createElement('div');
-          m.style.cssText =
-            'position:fixed;right:8px;bottom:8px;z-index:99999;background:#070c09;border:1px solid #57ff9a;' +
-            'color:#57ff9a;font:10px monospace;padding:4px 8px;pointer-events:none';
-          document.body.appendChild(m);
-          var lastY = window.scrollY, lastT = performance.now();
-          setInterval(function () {
-            var now = performance.now();
-            var v = Math.round(Math.abs(window.scrollY - lastY) / ((now - lastT) / 1000));
-            lastY = window.scrollY; lastT = now;
-            var lenis = document.documentElement.style.cssText;
-            m.textContent = 'scrollY=' + Math.round(window.scrollY) + ' | v=' + v + 'px/s | html.style=' + (lenis ? 'oui' : 'non');
-          }, 500);
-        });
-      })();
-    </script>
   </body>
 </html>
